@@ -1,0 +1,6 @@
+web/backend/venv/
+web/backend/.env
+__pycache__/
+*.pyc
+web.zip
+*database- minions.drawio.bkp

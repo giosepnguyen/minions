@@ -1,0 +1,2224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>HealthGuide AI</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        onclick="closeMobileSidebar()"
+      ></div>
+      <aside class="sidebar" id="sidebar">
+        <div class="logo" onclick="tryNavigate('home')">
+          <div class="logo-icon">+</div>
+          HealthGuide <span>AI</span>
+        </div>
+        <div class="nav-title" data-i18n="navMain">MAIN</div>
+        <button
+          class="nav-item active"
+          data-page="home"
+          onclick="tryNavigate('home')"
+        >
+          🏠 <span data-i18n="home">Home</span>
+        </button>
+        <button
+          class="nav-item nav-stay"
+          data-page="health-check"
+          onclick="startHealthCheck()"
+        >
+          🩺 <span data-i18n="healthCheck">Health Check</span>
+        </button>
+        <button
+          class="nav-item"
+          data-page="mini-lesson"
+          onclick="tryNavigate('mini-lesson')"
+        >
+          📖 <span data-i18n="miniLesson">Mini Lesson</span>
+        </button>
+        <button
+          class="nav-item"
+          data-page="disease-library"
+          onclick="tryNavigate('disease-library')"
+        >
+          📚 <span data-i18n="diseaseLibrary">Disease Library</span>
+        </button>
+        <button
+          class="nav-item"
+          data-page="nearby"
+          onclick="tryNavigate('nearby')"
+        >
+          📍 <span data-i18n="nearbyHealthcare">Nearby</span>
+        </button>
+        <div class="nav-title" data-i18n="navAccount">ACCOUNT</div>
+        <button
+          class="nav-item"
+          data-page="history"
+          onclick="tryNavigate('history')"
+        >
+          🕘 <span data-i18n="history">History</span>
+        </button>
+        <button
+          class="nav-item"
+          data-page="profile"
+          onclick="tryNavigate('profile')"
+        >
+          👤 <span data-i18n="profile">Profile</span>
+        </button>
+        <button
+          class="nav-item"
+          data-page="emergency"
+          onclick="tryNavigateEmergency()"
+        >
+          🚨 <span data-i18n="emergency">Emergency</span>
+        </button>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <div style="display: flex; align-items: center">
+            <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+              ☰
+            </button>
+            <div class="page-title" id="pageTitle">Home</div>
+          </div>
+          <div class="topbar-right">
+            <div class="language-switch">
+              <button id="langEN" class="active" onclick="changeLanguage('en')">
+                EN
+              </button>
+              <button id="langVI" onclick="changeLanguage('vi')">VI</button>
+            </div>
+            <div class="user-mini">
+              <strong id="topUserName">Guest</strong>
+              <div class="avatar" id="topAvatar">G</div>
+            </div>
+          </div>
+        </header>
+
+        <div class="content">
+          <div
+            class="check-lock-banner"
+            id="checkLockBanner"
+            data-i18n="checkInProgress"
+          >
+            ⚠️ You are in a Health Check. Leaving will lose your progress.
+          </div>
+
+          <!-- HOME -->
+          <section class="screen active" id="page-home">
+            <div class="home-hero">
+              <div class="eyebrow" data-i18n="healthEducation">
+                HEALTH EDUCATION PLATFORM
+              </div>
+              <h1>
+                <span data-i18n="heroTitle1">Understand your symptoms.</span
+                ><br /><span data-i18n="heroTitle2"
+                  >Make informed next steps.</span
+                >
+              </h1>
+              <p class="muted" data-i18n="heroDescription">
+                HealthGuide AI helps you organize symptoms and explore
+                educational health information.
+              </p>
+              <div class="home-actions">
+                <button
+                  class="btn btn-primary"
+                  onclick="startHealthCheck()"
+                  data-i18n="startHealthCheck"
+                >
+                  Start Health Check →
+                </button>
+              </div>
+              <div class="info-note" data-i18n="educationOnly">
+                Educational information only. Not a medical diagnosis.
+              </div>
+            </div>
+            <div class="home-grid">
+              <div class="home-card" onclick="tryNavigate('mini-lesson')">
+                <div class="home-icon">📖</div>
+                <h3 data-i18n="miniLesson">Mini Lesson</h3>
+                <p class="muted" data-i18n="miniLessonDesc">
+                  Short lessons under 3 minutes.
+                </p>
+              </div>
+              <div class="home-card" onclick="tryNavigate('disease-library')">
+                <div class="home-icon">📚</div>
+                <h3 data-i18n="diseaseLibrary">Disease Library</h3>
+                <p class="muted" data-i18n="diseaseLibraryDesc">
+                  Explore common conditions.
+                </p>
+              </div>
+              <div class="home-card" onclick="tryNavigate('nearby')">
+                <div class="home-icon">📍</div>
+                <h3 data-i18n="nearbyHealthcare">Nearby</h3>
+                <p class="muted" data-i18n="nearbyDesc">
+                  Find healthcare nearby.
+                </p>
+              </div>
+              <div class="home-card" onclick="tryNavigateEmergency()">
+                <div class="home-icon">🚨</div>
+                <h3 data-i18n="emergency">Emergency</h3>
+                <p class="muted" data-i18n="emergencyDesc">
+                  First-aid guidance.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- BODY -->
+          <section class="screen" id="page-health-check">
+            <div class="check-card">
+              <div class="eyebrow" data-i18n="step1">
+                HEALTH CHECK · STEP 1/4
+              </div>
+              <h2 data-i18n="whereProblem">Where is the problem?</h2>
+              <p class="muted" data-i18n="selectBodyMap">
+                Tap on the body area. The selected area will light up.
+              </p>
+              <div class="progress">
+                <span class="active"></span><span></span><span></span
+                ><span></span>
+              </div>
+              <div class="body-map-wrapper">
+                <div class="body-svg-box">
+                  <svg viewBox="0 0 220 560" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse
+                      class="body-part"
+                      data-area="Head"
+                      cx="110"
+                      cy="48"
+                      rx="34"
+                      ry="40"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <path
+                      class="body-part"
+                      data-area="Neck"
+                      d="M96 86 Q110 92 124 86 L126 108 Q110 114 94 108 Z"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <path
+                      class="body-part"
+                      data-area="Chest"
+                      d="M78 110 Q62 118 60 145 L60 200 Q110 212 160 200 L160 145 Q158 118 142 110 Q110 104 78 110 Z"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <path
+                      class="body-part"
+                      data-area="Abdomen"
+                      d="M60 200 Q110 214 160 200 L154 275 Q110 286 66 275 Z"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <path
+                      class="body-part"
+                      data-area="Arm"
+                      d="M60 125 Q42 132 34 160 Q28 190 32 215 L48 218 Q52 185 58 155 Z"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <ellipse
+                      class="body-part"
+                      data-area="Elbow"
+                      cx="40"
+                      cy="228"
+                      rx="13"
+                      ry="11"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <path
+                      class="body-part"
+                      data-area="Hand"
+                      d="M32 236 Q26 260 28 290 Q30 308 44 310 Q52 300 50 275 Q48 250 46 238 Z"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <path
+                      class="body-part"
+                      data-area="Arm"
+                      d="M160 125 Q178 132 186 160 Q192 190 188 215 L172 218 Q168 185 162 155 Z"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <ellipse
+                      class="body-part"
+                      data-area="Elbow"
+                      cx="180"
+                      cy="228"
+                      rx="13"
+                      ry="11"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <path
+                      class="body-part"
+                      data-area="Hand"
+                      d="M188 236 Q194 260 192 290 Q190 308 176 310 Q168 300 170 275 Q172 250 174 238 Z"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <path
+                      class="body-part"
+                      data-area="Leg"
+                      d="M68 275 Q88 282 100 275 L96 400 Q92 450 84 500 Q76 512 66 505 Q62 460 64 400 Z"
+                      onclick="selectBodyPart(this)"
+                    />
+                    <path
+                      class="body-part"
+                      data-area="Leg"
+                      d="M120 275 Q132 282 152 275 L156 400 Q158 460 154 505 Q144 512 136 500 Q128 450 124 400 Z"
+                      onclick="selectBodyPart(this)"
+                    />
+                  </svg>
+                </div>
+                <div style="flex: 1; min-width: 220px">
+                  <div
+                    class="selected-display"
+                    id="selectedDisplay"
+                    data-i18n="noAreaSelected"
+                  >
+                    No area selected yet
+                  </div>
+                  <p
+                    class="muted"
+                    style="margin-bottom: 12px"
+                    data-i18n="orTapBelow"
+                  >
+                    Or tap a label:
+                  </p>
+                  <div class="area-list">
+                    <button
+                      class="area-chip"
+                      data-area="Head"
+                      data-i18n="areaHead"
+                      onclick="selectBodyByName('Head')"
+                    >
+                      Head
+                    </button>
+                    <button
+                      class="area-chip"
+                      data-area="Neck"
+                      data-i18n="areaNeck"
+                      onclick="selectBodyByName('Neck')"
+                    >
+                      Neck
+                    </button>
+                    <button
+                      class="area-chip"
+                      data-area="Chest"
+                      data-i18n="areaChest"
+                      onclick="selectBodyByName('Chest')"
+                    >
+                      Chest
+                    </button>
+                    <button
+                      class="area-chip"
+                      data-area="Abdomen"
+                      data-i18n="areaAbdomen"
+                      onclick="selectBodyByName('Abdomen')"
+                    >
+                      Abdomen
+                    </button>
+                    <button
+                      class="area-chip"
+                      data-area="Back"
+                      data-i18n="areaBack"
+                      onclick="selectBodyByName('Back')"
+                    >
+                      Back
+                    </button>
+                    <button
+                      class="area-chip"
+                      data-area="Arm"
+                      data-i18n="areaArm"
+                      onclick="selectBodyByName('Arm')"
+                    >
+                      Arm
+                    </button>
+                    <button
+                      class="area-chip"
+                      data-area="Elbow"
+                      data-i18n="areaElbow"
+                      onclick="selectBodyByName('Elbow')"
+                    >
+                      Elbow
+                    </button>
+                    <button
+                      class="area-chip"
+                      data-area="Hand"
+                      data-i18n="areaHand"
+                      onclick="selectBodyByName('Hand')"
+                    >
+                      Hand
+                    </button>
+                    <button
+                      class="area-chip"
+                      data-area="Leg"
+                      data-i18n="areaLeg"
+                      onclick="selectBodyByName('Leg')"
+                    >
+                      Leg
+                    </button>
+                    <button
+                      class="area-chip"
+                      data-area="Skin"
+                      data-i18n="areaSkin"
+                      onclick="selectBodyByName('Skin')"
+                    >
+                      Skin
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="action-row">
+                <button
+                  class="btn btn-secondary"
+                  onclick="requestExitCheck('home')"
+                  data-i18n="exitCheck"
+                >
+                  Exit check
+                </button>
+                <button
+                  class="btn btn-primary"
+                  id="btnToCamera"
+                  onclick="goToCamera()"
+                  disabled
+                  data-i18n="continue"
+                >
+                  Continue →
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- CAMERA -->
+          <section class="screen" id="page-camera">
+            <div class="check-card">
+              <div class="eyebrow" data-i18n="step2">
+                HEALTH CHECK · STEP 2/4
+              </div>
+              <h2 data-i18n="scanAffected">Scan affected area</h2>
+              <p class="muted" data-i18n="positionArea">
+                Use live camera or upload a photo (optional).
+              </p>
+              <div class="progress">
+                <span class="active"></span><span class="active"></span
+                ><span></span><span></span>
+              </div>
+              <div class="camera-layout">
+                <div class="camera-box" id="cameraBox">
+                  <video id="cameraVideo" autoplay playsinline></video>
+                  <img id="uploadedImage" alt="" />
+                  <div class="camera-frame"></div>
+                  <div class="camera-placeholder" id="cameraPlaceholder">
+                    📷<br /><br /><span data-i18n="cameraOff"
+                      >Camera is off</span
+                    >
+                  </div>
+                </div>
+                <div class="card">
+                  <h3 data-i18n="cameraScanTitle">Camera & Photo</h3>
+                  <div class="camera-actions">
+                    <button
+                      class="btn btn-primary"
+                      id="cameraButton"
+                      onclick="openCamera()"
+                      data-i18n="openCamera"
+                    >
+                      Open Camera
+                    </button>
+                    <button
+                      class="btn btn-secondary"
+                      id="switchCameraBtn"
+                      onclick="switchCamera()"
+                      style="display: none"
+                      data-i18n="switchCam"
+                    >
+                      🔄 Switch
+                    </button>
+                    <button
+                      class="btn btn-secondary"
+                      id="stopCameraButton"
+                      onclick="stopCamera()"
+                      style="display: none"
+                      data-i18n="stopCamera"
+                    >
+                      Stop
+                    </button>
+                  </div>
+                  <div style="margin-top: 12px">
+                    <label
+                      class="btn btn-secondary"
+                      style="display: inline-flex; cursor: pointer"
+                    >
+                      📁 <span data-i18n="uploadPhoto">Upload Photo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style="display: none"
+                        onchange="handlePhotoUpload(event)"
+                      />
+                    </label>
+                  </div>
+                  <div
+                    class="camera-status"
+                    id="cameraStatus"
+                    data-i18n="cameraStatusOff"
+                  >
+                    Camera is currently off.
+                  </div>
+                </div>
+              </div>
+              <div class="action-row">
+                <button
+                  class="btn btn-secondary"
+                  onclick="
+                    stopCamera();
+                    openPage('health-check');
+                  "
+                  data-i18n="back"
+                >
+                  Back
+                </button>
+                <button
+                  class="btn btn-primary"
+                  onclick="goToAIChat()"
+                  data-i18n="continue"
+                >
+                  Continue →
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- AI CHAT -->
+          <section class="screen" id="page-ai-chat">
+            <div class="check-card">
+              <div class="eyebrow" data-i18n="step3">
+                HEALTH CHECK · STEP 3/4
+              </div>
+              <h2 data-i18n="aiInterview">AI Health Interview</h2>
+              <p class="muted" data-i18n="aiInterviewDesc">
+                The AI will ask a few questions about your symptoms.
+              </p>
+              <div class="progress">
+                <span class="active"></span><span class="active"></span
+                ><span class="active"></span><span></span>
+              </div>
+              <div class="ai-chat-container">
+                <div class="ai-chat-header">
+                  <div class="ai-avatar">AI</div>
+                  <div>
+                    <strong>HealthGuide AI</strong>
+                    <div
+                      class="muted"
+                      style="font-size: 12px"
+                      data-i18n="educationalAssistant"
+                    >
+                      Educational assistant
+                    </div>
+                  </div>
+                </div>
+                <div class="ai-chat-messages" id="aiChatMessages"></div>
+                <div class="quick-replies" id="quickReplies"></div>
+                <div class="ai-chat-input">
+                  <input
+                    id="aiChatInput"
+                    data-i18n-placeholder="chatPlaceholder"
+                    placeholder="Type your answer..."
+                  />
+                  <button
+                    class="btn btn-primary"
+                    onclick="sendAIChatMessage()"
+                    data-i18n="send"
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
+              <div class="action-row">
+                <button
+                  class="btn btn-secondary"
+                  onclick="openPage('camera')"
+                  data-i18n="back"
+                >
+                  Back
+                </button>
+                <button
+                  class="btn btn-primary"
+                  id="btnToResult"
+                  onclick="goToResult()"
+                  disabled
+                  data-i18n="seeResult"
+                >
+                  See Result →
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- RESULT -->
+          <section class="screen" id="page-results">
+            <div class="check-card">
+              <div class="eyebrow" data-i18n="step4">
+                HEALTH CHECK · STEP 4/4
+              </div>
+              <h2 data-i18n="referenceResult">Reference Result</h2>
+              <p class="muted" data-i18n="resultsSub">
+                Educational information only. Not a diagnosis.
+              </p>
+              <div class="progress">
+                <span class="active"></span><span class="active"></span
+                ><span class="active"></span><span class="active"></span>
+              </div>
+              <div class="limited-note" id="resultsLimitedNote">
+                ⚠️
+                <span data-i18n="limitedNote"
+                  >You skipped some information. Results may be less
+                  accurate.</span
+                >
+              </div>
+              <div class="result-card">
+                <h3 data-i18n="explanation">Explanation</h3>
+                <p id="resultExplanation">-</p>
+              </div>
+              <div class="result-card">
+                <h3 data-i18n="supportingFactors">Supporting factors</h3>
+                <ul
+                  id="resultSupporting"
+                  style="padding-left: 18px; font-size: 14px"
+                ></ul>
+              </div>
+              <div class="result-card">
+                <h3 data-i18n="recommendedAction">Recommended action</h3>
+                <p id="resultAction">-</p>
+              </div>
+              <div
+                class="result-card"
+                style="border-color: #f5c6c0; background: #fff8f8"
+              >
+                <h3 style="color: var(--danger)" data-i18n="warningSigns">
+                  Warning signs
+                </h3>
+                <ul
+                  id="resultWarnings"
+                  style="padding-left: 18px; font-size: 14px"
+                ></ul>
+              </div>
+              <div
+                class="result-card"
+                id="facilitiesCard"
+                style="display: none"
+              >
+                <h3 data-i18n="nearbyFacilities">
+                  Nearby emergency facilities
+                </h3>
+                <div id="resultFacilities"></div>
+              </div>
+              <div class="notice">
+                ⚠️ <strong data-i18n="noticeTitle">Important:</strong>
+                <span id="resultUncertainty"></span>
+              </div>
+              <div class="result-card" style="margin-top: 14px">
+                <h3 data-i18n="summary">Summary</h3>
+                <p>
+                  <strong data-i18n="bodyArea">Body Area:</strong>
+                  <span id="resultBody">-</span>
+                </p>
+                <p>
+                  <strong data-i18n="yourAnswers">Your answers:</strong>
+                  <span id="resultAnswers">-</span>
+                </p>
+              </div>
+              <div class="action-row">
+                <button
+                  class="btn btn-secondary"
+                  onclick="finishCheckAndGo('home')"
+                  data-i18n="backHome"
+                >
+                  Back to Home
+                </button>
+                <button
+                  class="btn btn-primary"
+                  onclick="startHealthCheck()"
+                  data-i18n="newCheck"
+                >
+                  New Check
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- MINI LESSON -->
+          <section class="screen" id="page-mini-lesson">
+            <div class="eyebrow" data-i18n="lessonEyebrow">QUICK LEARNING</div>
+            <h2 data-i18n="miniLesson">Mini Lesson</h2>
+            <p class="muted" data-i18n="miniLessonSub">
+              Short lessons under 3 minutes.
+            </p>
+            <div class="lesson-grid">
+              <div class="lesson-card" onclick="openLesson('cpr')">
+                <span class="lesson-tag firstaid" data-i18n="tagFirstAid"
+                  >FIRST AID</span
+                >
+                <h3 data-i18n="lessonCprTitle">CPR Basics</h3>
+                <p class="muted" data-i18n="lessonCprDesc">Hands-only CPR.</p>
+                <div class="lesson-time">
+                  ⏱ ~2 <span data-i18n="min">min</span>
+                </div>
+              </div>
+              <div class="lesson-card" onclick="openLesson('stroke')">
+                <span class="lesson-tag emergency" data-i18n="tagEmergency"
+                  >EMERGENCY</span
+                >
+                <h3 data-i18n="lessonStrokeTitle">Spot a Stroke (FAST)</h3>
+                <p class="muted" data-i18n="lessonStrokeDesc">
+                  Recognize stroke signs.
+                </p>
+                <div class="lesson-time">
+                  ⏱ ~2 <span data-i18n="min">min</span>
+                </div>
+              </div>
+              <div class="lesson-card" onclick="openLesson('choking')">
+                <span class="lesson-tag firstaid" data-i18n="tagFirstAid"
+                  >FIRST AID</span
+                >
+                <h3 data-i18n="lessonChokingTitle">Choking – Heimlich</h3>
+                <p class="muted" data-i18n="lessonChokingDesc">
+                  Help someone choking.
+                </p>
+                <div class="lesson-time">
+                  ⏱ ~2 <span data-i18n="min">min</span>
+                </div>
+              </div>
+              <div class="lesson-card" onclick="openLesson('dengue')">
+                <span class="lesson-tag common" data-i18n="tagCommon"
+                  >COMMON</span
+                >
+                <h3 data-i18n="lessonDengueTitle">Dengue Warning Signs</h3>
+                <p class="muted" data-i18n="lessonDengueDesc">
+                  When to seek care.
+                </p>
+                <div class="lesson-time">
+                  ⏱ ~2.5 <span data-i18n="min">min</span>
+                </div>
+              </div>
+              <div class="lesson-card" onclick="openLesson('burn')">
+                <span class="lesson-tag firstaid" data-i18n="tagFirstAid"
+                  >FIRST AID</span
+                >
+                <h3 data-i18n="lessonBurnTitle">Minor Burn Care</h3>
+                <p class="muted" data-i18n="lessonBurnDesc">Small burn care.</p>
+                <div class="lesson-time">
+                  ⏱ ~1.5 <span data-i18n="min">min</span>
+                </div>
+              </div>
+              <div class="lesson-card" onclick="openLesson('fever')">
+                <span class="lesson-tag common" data-i18n="tagCommon"
+                  >COMMON</span
+                >
+                <h3 data-i18n="lessonFeverTitle">Fever at Home</h3>
+                <p class="muted" data-i18n="lessonFeverDesc">
+                  Manage mild fever.
+                </p>
+                <div class="lesson-time">
+                  ⏱ ~2 <span data-i18n="min">min</span>
+                </div>
+              </div>
+            </div>
+            <div class="lesson-detail" id="lessonDetail">
+              <div class="lesson-content" id="lessonContent"></div>
+              <div style="margin-top: 16px">
+                <button
+                  class="btn btn-secondary"
+                  onclick="closeLesson()"
+                  data-i18n="backToLessons"
+                >
+                  ← Back to lessons
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- LIBRARY -->
+          <section class="screen" id="page-disease-library">
+            <div class="eyebrow" data-i18n="libraryEyebrow">KNOWLEDGE BASE</div>
+            <h2 data-i18n="diseaseLibrary">Disease Library</h2>
+            <p class="muted" data-i18n="libraryDesc">
+              Explore educational guides.
+            </p>
+            <div class="search">
+              <input
+                id="diseaseSearchInput"
+                data-i18n-placeholder="searchDiseases"
+                placeholder="Search diseases..."
+                oninput="filterDiseases()"
+              />
+            </div>
+            <div class="grid-3" id="diseaseGrid" style="margin-top: 16px"></div>
+            <div
+              id="diseaseDetailCard"
+              class="card"
+              style="
+                margin-top: 18px;
+                display: none;
+                border-color: var(--green);
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <h3 id="detailTitle" style="color: var(--green-dark)"></h3>
+                <button
+                  class="btn btn-secondary"
+                  onclick="closeDiseaseDetail()"
+                  style="padding: 4px 10px"
+                >
+                  ✕
+                </button>
+              </div>
+              <div
+                id="detailContent"
+                style="margin-top: 10px; font-size: 14px; line-height: 1.6"
+              ></div>
+            </div>
+          </section>
+
+          <!-- NEARBY -->
+          <section class="screen" id="page-nearby">
+            <div class="eyebrow" data-i18n="locatorEyebrow">LOCATOR</div>
+            <h2 data-i18n="nearbyHealthcare">Nearby Healthcare</h2>
+            <div
+              class="card"
+              style="margin-top: 16px; padding: 30px; text-align: center"
+            >
+              <button class="btn btn-primary" onclick="requestLocation()">
+                📍 <span data-i18n="allowLocation">Allow Location</span>
+              </button>
+              <div
+                id="locationStatus"
+                class="muted"
+                style="margin-top: 10px; font-size: 13px"
+                data-i18n="locationNotRequested"
+              >
+                Location status: Not requested
+              </div>
+            </div>
+          </section>
+
+          <!-- HISTORY -->
+          <section class="screen" id="page-history">
+            <div class="eyebrow" data-i18n="historyEyebrow">LOGS</div>
+            <h2 data-i18n="history">Health Check History</h2>
+            <p class="muted" data-i18n="historySub">Previous assessments.</p>
+            <div class="card" style="margin-top: 16px" id="historyList"></div>
+          </section>
+
+          <!-- PROFILE -->
+          <section class="screen" id="page-profile">
+            <div class="eyebrow" data-i18n="profileEyebrow">USER SETTINGS</div>
+            <h2 data-i18n="profile">Profile</h2>
+            <p class="muted" data-i18n="profileSub">
+              Manage your personal information.
+            </p>
+            <div class="grid-2" style="margin-top: 16px">
+              <div class="card">
+                <h3 data-i18n="personalInfo">Personal Information</h3>
+                <div style="margin: 12px 0">
+                  <div class="avatar-upload" id="avatarPreview">
+                    <span>👤</span
+                    ><input
+                      type="file"
+                      accept="image/*"
+                      onchange="handleAvatarUpload(event)"
+                    />
+                  </div>
+                  <small class="muted" data-i18n="clickUpload"
+                    >Click to upload avatar</small
+                  >
+                </div>
+                <div class="form-group">
+                  <label data-i18n="name">Name *</label
+                  ><input id="profileName" oninput="validateProfile()" />
+                  <div
+                    class="error-text"
+                    id="nameError"
+                    data-i18n="errorName"
+                  ></div>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="age">Age *</label
+                  ><input
+                    id="profileAge"
+                    type="number"
+                    min="1"
+                    max="120"
+                    oninput="validateProfile()"
+                  />
+                  <div
+                    class="error-text"
+                    id="ageError"
+                    data-i18n="errorAge"
+                  ></div>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="sex">Sex</label>
+                  <select id="profileSex">
+                    <option value="" data-i18n="select">Select</option>
+                    <option value="Male" data-i18n="male">Male</option>
+                    <option value="Female" data-i18n="female">Female</option>
+                    <option value="Other" data-i18n="other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="height">Height (cm)</label
+                  ><input
+                    id="profileHeight"
+                    type="number"
+                    oninput="validateProfile()"
+                  />
+                  <div
+                    class="error-text"
+                    id="heightError"
+                    data-i18n="errorHeight"
+                  ></div>
+                </div>
+                <div class="form-group">
+                  <label data-i18n="weight">Weight (kg)</label
+                  ><input
+                    id="profileWeight"
+                    type="number"
+                    oninput="validateProfile()"
+                  />
+                  <div
+                    class="error-text"
+                    id="weightError"
+                    data-i18n="errorWeight"
+                  ></div>
+                </div>
+              </div>
+              <div class="card">
+                <h3 data-i18n="healthInfo">Health Information</h3>
+                <div class="form-group" style="margin-top: 12px">
+                  <label data-i18n="existingConditions"
+                    >Existing Conditions</label
+                  ><input
+                    id="profileConditions"
+                    data-i18n-placeholder="phConditions"
+                  />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="allergies">Allergies</label
+                  ><input
+                    id="profileAllergies"
+                    data-i18n-placeholder="phAllergies"
+                  />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="currentMedications"
+                    >Current Medications</label
+                  ><input id="profileMeds" />
+                </div>
+                <div class="form-group">
+                  <label data-i18n="familyHistory">Family History</label
+                  ><input id="profileFamily" />
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 16px">
+              <button
+                class="btn btn-primary"
+                id="btnSaveProfile"
+                onclick="saveProfile()"
+                disabled
+                data-i18n="saveProfile"
+              >
+                Save Profile
+              </button>
+            </div>
+          </section>
+
+          <!-- EMERGENCY -->
+          <section class="screen" id="page-emergency">
+            <div
+              class="eyebrow"
+              style="color: var(--danger)"
+              data-i18n="emergencyEyebrow"
+            >
+              URGENT SUPPORT
+            </div>
+            <h2 data-i18n="emergency">Emergency Help</h2>
+            <p class="muted" data-i18n="emergencySub">
+              Select the situation. Call 115 first, then follow the steps.
+            </p>
+            <div id="emSelectView">
+              <div class="em-situation-grid">
+                <button class="em-card" onclick="openEmGuide('stroke')">
+                  <div class="em-icon">🧠</div>
+                  <h3 data-i18n="emStroke">Suspected Stroke</h3>
+                  <p class="muted" data-i18n="emStrokeDesc">
+                    Face droop, arm weakness, speech difficulty.
+                  </p>
+                </button>
+                <button class="em-card" onclick="openEmGuide('cpr')">
+                  <div class="em-icon">💓</div>
+                  <h3 data-i18n="emCPR">Unresponsive / Not breathing</h3>
+                  <p class="muted" data-i18n="emCPRDesc">
+                    Not responding, not breathing normally.
+                  </p>
+                </button>
+                <button class="em-card" onclick="openEmGuide('choking')">
+                  <div class="em-icon">😮</div>
+                  <h3 data-i18n="emChoking">Choking</h3>
+                  <p class="muted" data-i18n="emChokingDesc">
+                    Cannot speak, cough or breathe.
+                  </p>
+                </button>
+              </div>
+              <div
+                class="card"
+                style="
+                  margin-top: 18px;
+                  border-color: var(--danger);
+                  background: #fff8f8;
+                "
+              >
+                <p style="font-size: 14px" data-i18n="emGeneralNote">
+                  If life-threatening, call <strong>115</strong> immediately.
+                </p>
+                <button
+                  class="btn btn-danger"
+                  style="margin-top: 12px"
+                  onclick="showModal('callModal')"
+                >
+                  🚨 <span data-i18n="callEmergency">Call 115</span>
+                </button>
+              </div>
+            </div>
+            <div class="em-detail" id="emDetailView">
+              <div class="call-banner">
+                <h3 data-i18n="callFirst">1. Call 115 first</h3>
+                <p data-i18n="callFirstText">
+                  While waiting, follow the steps below.
+                </p>
+                <button
+                  class="btn"
+                  style="
+                    background: white;
+                    color: var(--danger);
+                    font-weight: 700;
+                  "
+                  onclick="showModal('callModal')"
+                >
+                  🚨 <span data-i18n="callEmergency">Call 115</span>
+                </button>
+              </div>
+              <div id="emGuideContent"></div>
+              <div class="action-row" style="margin-top: 20px">
+                <button
+                  class="btn btn-secondary"
+                  onclick="backToEmSelect()"
+                  data-i18n="backToSituations"
+                >
+                  ← Back
+                </button>
+                <button
+                  class="btn btn-primary"
+                  onclick="tryNavigate('mini-lesson')"
+                  data-i18n="relatedLesson"
+                >
+                  Related Mini Lesson
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exit confirm modal -->
+    <div class="modal-overlay" id="exitCheckModal">
+      <div class="modal">
+        <h3 data-i18n="exitTitle">Leave Health Check?</h3>
+        <p data-i18n="exitText">
+          You are in the middle of a check. Leaving will clear selected area,
+          answers and progress.
+        </p>
+        <div class="modal-actions">
+          <button
+            class="btn btn-secondary"
+            onclick="closeModal('exitCheckModal')"
+            data-i18n="stay"
+          >
+            Stay
+          </button>
+          <button
+            class="btn btn-danger"
+            onclick="confirmExitCheck()"
+            data-i18n="leaveAnyway"
+          >
+            Leave anyway
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="profileChoiceModal">
+      <div class="modal">
+        <h3 data-i18n="profileChoiceTitle">Before starting</h3>
+        <p data-i18n="profileChoiceText">
+          Profile helps better results. You can skip, but results may be less
+          accurate.
+        </p>
+        <div class="modal-actions">
+          <button
+            class="btn btn-secondary"
+            onclick="skipProfileAndStart()"
+            data-i18n="skipProfile"
+          >
+            Skip Profile
+          </button>
+          <button
+            class="btn btn-primary"
+            onclick="goToFillProfile()"
+            data-i18n="fillProfile"
+          >
+            Fill Profile
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay" id="messageModal">
+      <div class="modal">
+        <h3 id="messageModalTitle"></h3>
+        <p id="messageModalText"></p>
+        <div class="modal-actions">
+          <button
+            class="btn btn-primary"
+            onclick="closeModal('messageModal')"
+            data-i18n="ok"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay" id="callModal">
+      <div class="modal">
+        <h3 data-i18n="callTitle">Call 115</h3>
+        <p data-i18n="callText">
+          Prototype only. In a real emergency, dial 115 on your phone.
+        </p>
+        <div class="modal-actions">
+          <button
+            class="btn btn-danger"
+            onclick="closeModal('callModal')"
+            data-i18n="ok"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentLang = "en";
+      let selectedBodyArea = "";
+      let mediaStream = null;
+      let currentFacingMode = "user";
+      let aiChatStep = 0;
+      let aiAnswers = [];
+      let aiFinished = false;
+      let isProfileCompleted = false;
+      let skippedProfile = false;
+      let isHealthCheckActive = false;
+      let pendingNavigate = null;
+
+      const AREA_LABELS = {
+        en: {
+          Head: "Head",
+          Neck: "Neck",
+          Chest: "Chest",
+          Abdomen: "Abdomen",
+          Back: "Back",
+          Arm: "Arm",
+          Elbow: "Elbow",
+          Hand: "Hand",
+          Leg: "Leg",
+          Skin: "Skin",
+        },
+        vi: {
+          Head: "Đầu",
+          Neck: "Cổ",
+          Chest: "Ngực",
+          Abdomen: "Bụng",
+          Back: "Lưng",
+          Arm: "Cánh tay",
+          Elbow: "Khủy tay",
+          Hand: "Bàn tay",
+          Leg: "Chân",
+          Skin: "Da",
+        },
+      };
+      const AI_QUESTIONS = {
+        en: [
+          "You selected <strong>{area}</strong>. How long have symptoms lasted?",
+          "How severe? (Mild / Moderate / Severe)",
+          "Getting worse, same, or improving?",
+          "Any fever, fatigue, or nausea?",
+          "Thank you. Enough for a reference summary.",
+        ],
+        vi: [
+          "Bạn chọn vùng <strong>{area}</strong>. Triệu chứng khoảng bao lâu?",
+          "Mức độ? (Nhẹ / Trung bình / Nặng)",
+          "Nặng hơn, giữ nguyên hay đỡ hơn?",
+          "Có sốt, mệt, buồn nôn không?",
+          "Cảm ơn. Đã đủ thông tin tham khảo.",
+        ],
+      };
+      const QUICK_OPTIONS = {
+        en: [
+          ["Today", "1–3 days", "More than a week"],
+          ["Mild", "Moderate", "Severe"],
+          ["Getting worse", "Same", "Improving"],
+          ["Yes", "No", "Not sure"],
+        ],
+        vi: [
+          ["Hôm nay", "1–3 ngày", "Hơn 1 tuần"],
+          ["Nhẹ", "Trung bình", "Nặng"],
+          ["Nặng hơn", "Giữ nguyên", "Đang đỡ"],
+          ["Có", "Không", "Không chắc"],
+        ],
+      };
+      let DISEASES = [];
+
+      async function loadDiseasesFromAPI() {
+        try {
+          const res = await fetch("http://127.0.0.1:8000/api/diseases");
+          const data = await res.json();
+          DISEASES = data.map((d) => ({
+            id: "d" + d.id,
+            tag: "General",
+            en: {
+              name: d.name,
+              desc: d.description,
+              detail:
+                d.description +
+                "\n\nCauses: " +
+                d.causes +
+                "\n\nTreatment: " +
+                d.treatment,
+            },
+            vi: {
+              name: d.name,
+              desc: d.description,
+              detail:
+                d.description +
+                "\n\nNguyên nhân: " +
+                d.causes +
+                "\n\nĐiều trị: " +
+                d.treatment,
+            },
+          }));
+          renderDiseaseGrid();
+        } catch (err) {
+          console.error("Không lấy được dữ liệu bệnh:", err);
+        }
+      }
+      const TAG_I18N = {
+        en: {
+          Viral: "Viral",
+          Respiratory: "Respiratory",
+          Chronic: "Chronic",
+          Metabolic: "Metabolic",
+          Neurological: "Neurological",
+          Digestive: "Digestive",
+          Allergy: "Allergy",
+          General: "General",
+        },
+        vi: {
+          Viral: "Virus",
+          Respiratory: "Hô hấp",
+          Chronic: "Mạn tính",
+          Metabolic: "Chuyển hóa",
+          Neurological: "Thần kinh",
+          Digestive: "Tiêu hóa",
+          Allergy: "Dị ứng",
+          General: "Từ CSDL",
+        },
+      };
+      const HISTORY_DATA = [
+        {
+          en: {
+            date: "August 20, 2026",
+            note: "Headache, Fatigue (Head)",
+            badge: "Common Cold",
+          },
+          vi: {
+            date: "20 tháng 8, 2026",
+            note: "Đau đầu, mệt (Đầu)",
+            badge: "Cảm lạnh",
+          },
+        },
+        {
+          en: {
+            date: "August 12, 2026",
+            note: "Chest discomfort (Chest)",
+            badge: "Muscle strain",
+          },
+          vi: {
+            date: "12 tháng 8, 2026",
+            note: "Khó chịu ngực (Ngực)",
+            badge: "Căng cơ",
+          },
+        },
+        {
+          en: {
+            date: "July 28, 2026",
+            note: "Skin rash (Skin)",
+            badge: "Allergic reaction",
+          },
+          vi: {
+            date: "28 tháng 7, 2026",
+            note: "Phát ban (Da)",
+            badge: "Phản ứng dị ứng",
+          },
+        },
+      ];
+      const LESSONS = {
+        cpr: {
+          en: `<h3>CPR – Hands-only</h3><ol><li>Call 115.</li><li>Hand on center of chest.</li><li>Push 100–120/min.</li><li>Continue until help arrives.</li></ol>`,
+          vi: `<h3>CPR – Chỉ dùng tay</h3><ol><li>Gọi 115.</li><li>Tay giữa ngực.</li><li>Ấn 100–120 lần/phút.</li><li>Tiếp tục đến khi có hỗ trợ.</li></ol>`,
+        },
+        stroke: {
+          en: `<h3>Stroke – FAST</h3><ul><li><strong>F</strong> Face droop</li><li><strong>A</strong> Arm weakness</li><li><strong>S</strong> Speech difficulty</li><li><strong>T</strong> Call 115</li></ul>`,
+          vi: `<h3>Đột quỵ – FAST</h3><ul><li><strong>F</strong> Mặt xệ</li><li><strong>A</strong> Yếu tay</li><li><strong>S</strong> Nói khó</li><li><strong>T</strong> Gọi 115</li></ul>`,
+        },
+        choking: {
+          en: `<h3>Choking – Heimlich</h3><ol><li>Ask if choking.</li><li>Fist above navel.</li><li>Thrust inward and up.</li></ol>`,
+          vi: `<h3>Hóc – Heimlich</h3><ol><li>Hỏi có bị hóc không.</li><li>Nắm đấm trên rốn.</li><li>Đẩy vào trong và lên.</li></ol>`,
+        },
+        dengue: {
+          en: `<h3>Dengue warning</h3><ul><li>Severe abdominal pain</li><li>Persistent vomiting</li><li>Bleeding</li><li>Extreme fatigue</li></ul>`,
+          vi: `<h3>Cảnh báo sốt xuất huyết</h3><ul><li>Đau bụng dữ dội</li><li>Nôn nhiều</li><li>Chảy máu</li><li>Mệt lả</li></ul>`,
+        },
+        burn: {
+          en: `<h3>Minor burn</h3><ol><li>Cool water 10–20 min.</li><li>No ice/butter.</li><li>Cover loosely.</li></ol>`,
+          vi: `<h3>Bỏng nhẹ</h3><ol><li>Nước mát 10–20 phút.</li><li>Không đá/bơ.</li><li>Che nhẹ.</li></ol>`,
+        },
+        fever: {
+          en: `<h3>Fever at home</h3><ul><li>Rest, fluids.</li><li>Light clothing.</li><li>Watch warning signs.</li></ul>`,
+          vi: `<h3>Sốt tại nhà</h3><ul><li>Nghỉ ngơi, uống nước.</li><li>Mặc mỏng.</li><li>Theo dõi dấu hiệu nguy hiểm.</li></ul>`,
+        },
+      };
+      const EM_GUIDES = {
+        stroke: {
+          en: `<h3 style="color:var(--danger)">Stroke – FAST</h3><div class="fast-box"><div class="fast-item"><strong>F</strong><span>Face</span></div><div class="fast-item"><strong>A</strong><span>Arms</span></div><div class="fast-item"><strong>S</strong><span>Speech</span></div><div class="fast-item"><strong>T</strong><span>115</span></div></div><ol class="step-list"><li>Call <strong>115</strong>.</li><li>Keep still. No food/drink.</li><li>Check breathing → CPR if needed.</li><li>Stay until help arrives.</li></ol>`,
+          vi: `<h3 style="color:var(--danger)">Đột quỵ – FAST</h3><div class="fast-box"><div class="fast-item"><strong>F</strong><span>Mặt</span></div><div class="fast-item"><strong>A</strong><span>Tay</span></div><div class="fast-item"><strong>S</strong><span>Nói</span></div><div class="fast-item"><strong>T</strong><span>115</span></div></div><ol class="step-list"><li>Gọi <strong>115</strong>.</li><li>Nằm yên. Không ăn uống.</li><li>Kiểm tra thở → CPR nếu cần.</li><li>Ở bên đến khi có người đến.</li></ol>`,
+        },
+        cpr: {
+          en: `<h3 style="color:var(--danger)">CPR</h3><ol class="step-list"><li>Call <strong>115</strong>.</li><li>Flat surface.</li><li>Hands on center of chest.</li><li>Push <strong>100–120/min</strong>.</li><li>Continue until help arrives.</li></ol>`,
+          vi: `<h3 style="color:var(--danger)">CPR</h3><ol class="step-list"><li>Gọi <strong>115</strong>.</li><li>Mặt phẳng cứng.</li><li>Tay giữa ngực.</li><li>Ấn <strong>100–120 lần/phút</strong>.</li><li>Tiếp tục đến khi có hỗ trợ.</li></ol>`,
+        },
+        choking: {
+          en: `<h3 style="color:var(--danger)">Choking</h3><ol class="step-list"><li>Confirm choking.</li><li>Call <strong>115</strong>.</li><li>Heimlich thrusts.</li><li>If unresponsive → CPR.</li></ol>`,
+          vi: `<h3 style="color:var(--danger)">Hóc dị vật</h3><ol class="step-list"><li>Xác nhận bị hóc.</li><li>Gọi <strong>115</strong>.</li><li>Thủ thuật Heimlich.</li><li>Bất tỉnh → CPR.</li></ol>`,
+        },
+      };
+
+      const translations = {
+        en: {
+          navMain: "MAIN",
+          navAccount: "ACCOUNT",
+          home: "Home",
+          healthCheck: "Health Check",
+          miniLesson: "Mini Lesson",
+          diseaseLibrary: "Disease Library",
+          nearbyHealthcare: "Nearby",
+          history: "History",
+          profile: "Profile",
+          emergency: "Emergency",
+          healthEducation: "HEALTH EDUCATION PLATFORM",
+          heroTitle1: "Understand your symptoms.",
+          heroTitle2: "Make informed next steps.",
+          heroDescription:
+            "HealthGuide AI helps you organize symptoms and explore educational health information.",
+          startHealthCheck: "Start Health Check →",
+          educationOnly:
+            "Educational information only. Not a medical diagnosis.",
+          miniLessonDesc: "Short lessons under 3 minutes.",
+          diseaseLibraryDesc: "Explore common conditions.",
+          nearbyDesc: "Find healthcare nearby.",
+          emergencyDesc: "First-aid guidance.",
+          step1: "HEALTH CHECK · STEP 1/4",
+          step2: "HEALTH CHECK · STEP 2/4",
+          step3: "HEALTH CHECK · STEP 3/4",
+          step4: "HEALTH CHECK · STEP 4/4",
+          whereProblem: "Where is the problem?",
+          selectBodyMap: "Tap the body area. Selected area lights up.",
+          noAreaSelected: "No area selected yet",
+          orTapBelow: "Or tap a label:",
+          areaHead: "Head",
+          areaNeck: "Neck",
+          areaChest: "Chest",
+          areaAbdomen: "Abdomen",
+          areaBack: "Back",
+          areaArm: "Arm",
+          areaElbow: "Elbow",
+          areaHand: "Hand",
+          areaLeg: "Leg",
+          areaSkin: "Skin",
+          back: "Back",
+          continue: "Continue →",
+          exitCheck: "Exit check",
+          scanAffected: "Scan affected area",
+          positionArea: "Live camera or upload photo (optional).",
+          cameraOff: "Camera is off",
+          cameraScanTitle: "Camera & Photo",
+          openCamera: "Open Camera",
+          switchCam: "🔄 Switch",
+          stopCamera: "Stop",
+          uploadPhoto: "Upload Photo",
+          cameraStatusOff: "Camera is currently off.",
+          aiInterview: "AI Health Interview",
+          aiInterviewDesc: "AI will ask a few questions first.",
+          educationalAssistant: "Educational assistant",
+          send: "Send",
+          seeResult: "See Result →",
+          chatPlaceholder: "Type your answer...",
+          referenceResult: "Reference Result",
+          resultsSub: "Educational only. Not a diagnosis.",
+          explanation: "Explanation",
+          supportingFactors: "Supporting factors",
+          recommendedAction: "Recommended action",
+          warningSigns: "Warning signs",
+          nearbyFacilities: "Nearby emergency facilities",
+          summary: "Summary",
+          bodyArea: "Body Area:",
+          yourAnswers: "Your answers:",
+          noticeTitle: "Important:",
+          backHome: "Back to Home",
+          newCheck: "New Check",
+          limitedNote:
+            "You skipped some information. Results may be less accurate.",
+          lessonEyebrow: "QUICK LEARNING",
+          miniLessonSub: "Short lessons under 3 minutes.",
+          tagFirstAid: "FIRST AID",
+          tagEmergency: "EMERGENCY",
+          tagCommon: "COMMON",
+          min: "min",
+          lessonCprTitle: "CPR Basics",
+          lessonCprDesc: "Hands-only CPR.",
+          lessonStrokeTitle: "Spot a Stroke (FAST)",
+          lessonStrokeDesc: "Recognize stroke signs.",
+          lessonChokingTitle: "Choking – Heimlich",
+          lessonChokingDesc: "Help someone choking.",
+          lessonDengueTitle: "Dengue Warning Signs",
+          lessonDengueDesc: "When to seek care.",
+          lessonBurnTitle: "Minor Burn Care",
+          lessonBurnDesc: "Small burn care.",
+          lessonFeverTitle: "Fever at Home",
+          lessonFeverDesc: "Manage mild fever.",
+          backToLessons: "← Back to lessons",
+          libraryEyebrow: "KNOWLEDGE BASE",
+          libraryDesc: "Explore educational guides.",
+          searchDiseases: "Search diseases...",
+          locatorEyebrow: "LOCATOR",
+          allowLocation: "Allow Location",
+          locationNotRequested: "Location status: Not requested",
+          historyEyebrow: "LOGS",
+          historySub: "Previous assessments.",
+          profileEyebrow: "USER SETTINGS",
+          profileSub: "Manage your personal information.",
+          personalInfo: "Personal Information",
+          name: "Name *",
+          age: "Age *",
+          sex: "Sex",
+          height: "Height (cm)",
+          weight: "Weight (kg)",
+          clickUpload: "Click to upload avatar",
+          select: "Select",
+          male: "Male",
+          female: "Female",
+          other: "Other",
+          healthInfo: "Health Information",
+          existingConditions: "Existing Conditions",
+          allergies: "Allergies",
+          currentMedications: "Current Medications",
+          familyHistory: "Family History",
+          phConditions: "e.g. Asthma",
+          phAllergies: "e.g. Penicillin",
+          saveProfile: "Save Profile",
+          emergencyEyebrow: "URGENT SUPPORT",
+          emergencySub: "Select situation. Call 115 first, then follow steps.",
+          emStroke: "Suspected Stroke",
+          emStrokeDesc: "Face droop, arm weakness, speech difficulty.",
+          emCPR: "Unresponsive / Not breathing",
+          emCPRDesc: "Not responding, not breathing normally.",
+          emChoking: "Choking",
+          emChokingDesc: "Cannot speak, cough or breathe.",
+          emGeneralNote: "If life-threatening, call 115 immediately.",
+          callEmergency: "Call 115",
+          callFirst: "1. Call 115 first",
+          callFirstText: "While waiting, follow the steps below.",
+          backToSituations: "← Back",
+          relatedLesson: "Related Mini Lesson",
+          errorName: "Name is required.",
+          errorAge: "Age must be 1–120.",
+          errorHeight: "Invalid height.",
+          errorWeight: "Invalid weight.",
+          profileChoiceTitle: "Before starting",
+          profileChoiceText:
+            "Profile helps better results. You can skip, but results may be less accurate.",
+          skipProfile: "Skip Profile",
+          fillProfile: "Fill Profile",
+          callTitle: "Call 115",
+          callText: "Prototype only. In a real emergency, dial 115.",
+          ok: "OK",
+          profileSaved: "Profile saved!",
+          guest: "Guest",
+          checkInProgress:
+            "⚠️ You are in a Health Check. Leaving will lose your progress.",
+          exitTitle: "Leave Health Check?",
+          exitText:
+            "You are in the middle of a check. Leaving will clear selected area, answers and progress.",
+          stay: "Stay",
+          leaveAnyway: "Leave anyway",
+        },
+        vi: {
+          navMain: "CHÍNH",
+          navAccount: "TÀI KHOẢN",
+          home: "Trang chủ",
+          healthCheck: "Kiểm tra sức khỏe",
+          miniLesson: "Bài học ngắn",
+          diseaseLibrary: "Thư viện bệnh học",
+          nearbyHealthcare: "Gần đây",
+          history: "Lịch sử",
+          profile: "Hồ sơ",
+          emergency: "Khẩn cấp",
+          healthEducation: "NỀN TẢNG GIÁO DỤC SỨC KHỎE",
+          heroTitle1: "Hiểu rõ triệu chứng của bạn.",
+          heroTitle2: "Đưa ra bước đi tiếp theo phù hợp.",
+          heroDescription:
+            "HealthGuide AI giúp bạn tổ chức triệu chứng và khám phá thông tin sức khỏe giáo dục.",
+          startHealthCheck: "Bắt đầu kiểm tra →",
+          educationOnly:
+            "Thông tin giáo dục mang tính tham khảo. Không phải chẩn đoán y khoa.",
+          miniLessonDesc: "Bài học ngắn dưới 3 phút.",
+          diseaseLibraryDesc: "Khám phá các tình trạng phổ biến.",
+          nearbyDesc: "Tìm cơ sở y tế gần bạn.",
+          emergencyDesc: "Hướng dẫn sơ cứu.",
+          step1: "KIỂM TRA · BƯỚC 1/4",
+          step2: "KIỂM TRA · BƯỚC 2/4",
+          step3: "KIỂM TRA · BƯỚC 3/4",
+          step4: "KIỂM TRA · BƯỚC 4/4",
+          whereProblem: "Vấn đề ở khu vực nào?",
+          selectBodyMap: "Chạm vào vùng cơ thể. Vùng chọn sẽ sáng lên.",
+          noAreaSelected: "Chưa chọn vùng nào",
+          orTapBelow: "Hoặc chọn nhãn:",
+          areaHead: "Đầu",
+          areaNeck: "Cổ",
+          areaChest: "Ngực",
+          areaAbdomen: "Bụng",
+          areaBack: "Lưng",
+          areaArm: "Cánh tay",
+          areaElbow: "Khủy tay",
+          areaHand: "Bàn tay",
+          areaLeg: "Chân",
+          areaSkin: "Da",
+          back: "Quay lại",
+          continue: "Tiếp tục →",
+          exitCheck: "Thoát kiểm tra",
+          scanAffected: "Quét vùng bị ảnh hưởng",
+          positionArea: "Camera hoặc tải ảnh (không bắt buộc).",
+          cameraOff: "Camera đang tắt",
+          cameraScanTitle: "Camera & Ảnh",
+          openCamera: "Mở Camera",
+          switchCam: "🔄 Đổi cam",
+          stopCamera: "Tắt",
+          uploadPhoto: "Tải ảnh lên",
+          cameraStatusOff: "Camera hiện đang tắt.",
+          aiInterview: "Phỏng vấn sức khỏe AI",
+          aiInterviewDesc: "AI sẽ hỏi trước một vài câu.",
+          educationalAssistant: "Trợ lý giáo dục",
+          send: "Gửi",
+          seeResult: "Xem kết quả →",
+          chatPlaceholder: "Nhập câu trả lời...",
+          referenceResult: "Kết quả tham khảo",
+          resultsSub: "Chỉ thông tin giáo dục. Không phải chẩn đoán.",
+          explanation: "Giải thích",
+          supportingFactors: "Yếu tố hỗ trợ",
+          recommendedAction: "Hành động đề xuất",
+          warningSigns: "Dấu hiệu cảnh báo",
+          nearbyFacilities: "Cơ sở cấp cứu gần đây",
+          summary: "Tóm tắt",
+          bodyArea: "Vùng cơ thể:",
+          yourAnswers: "Câu trả lời của bạn:",
+          noticeTitle: "Lưu ý:",
+          backHome: "Về trang chủ",
+          newCheck: "Kiểm tra mới",
+          limitedNote:
+            "Bạn đã bỏ qua một số thông tin. Kết quả có thể kém chính xác hơn.",
+          lessonEyebrow: "HỌC NHANH",
+          miniLessonSub: "Bài học ngắn dưới 3 phút.",
+          tagFirstAid: "SƠ CỨU",
+          tagEmergency: "CẤP CỨU",
+          tagCommon: "THƯỜNG GẶP",
+          min: "phút",
+          lessonCprTitle: "CPR cơ bản",
+          lessonCprDesc: "CPR chỉ dùng tay.",
+          lessonStrokeTitle: "Nhận biết đột quỵ (FAST)",
+          lessonStrokeDesc: "Nhận dấu hiệu đột quỵ.",
+          lessonChokingTitle: "Hóc dị vật – Heimlich",
+          lessonChokingDesc: "Giúp người bị hóc.",
+          lessonDengueTitle: "Dấu hiệu sốt xuất huyết",
+          lessonDengueDesc: "Khi nào cần đi khám.",
+          lessonBurnTitle: "Xử lý bỏng nhẹ",
+          lessonBurnDesc: "Cách xử lý bỏng nhỏ.",
+          lessonFeverTitle: "Xử lý sốt tại nhà",
+          lessonFeverDesc: "Quản lý sốt nhẹ.",
+          backToLessons: "← Về danh sách bài học",
+          libraryEyebrow: "CƠ SỞ KIẾN THỨC",
+          libraryDesc: "Khám phá hướng dẫn giáo dục.",
+          searchDiseases: "Tìm bệnh...",
+          locatorEyebrow: "ĐỊNH VỊ",
+          allowLocation: "Cho phép vị trí",
+          locationNotRequested: "Trạng thái vị trí: Chưa yêu cầu",
+          historyEyebrow: "NHẬT KÝ",
+          historySub: "Các lần đánh giá trước.",
+          profileEyebrow: "CÀI ĐẶT",
+          profileSub: "Quản lý thông tin cá nhân.",
+          personalInfo: "Thông tin cá nhân",
+          name: "Họ tên *",
+          age: "Tuổi *",
+          sex: "Giới tính",
+          height: "Chiều cao (cm)",
+          weight: "Cân nặng (kg)",
+          clickUpload: "Bấm để tải ảnh đại diện",
+          select: "Chọn",
+          male: "Nam",
+          female: "Nữ",
+          other: "Khác",
+          healthInfo: "Thông tin sức khỏe",
+          existingConditions: "Bệnh lý nền",
+          allergies: "Dị ứng",
+          currentMedications: "Thuốc đang dùng",
+          familyHistory: "Tiền sử gia đình",
+          phConditions: "vd: Hen suyễn",
+          phAllergies: "vd: Penicillin",
+          saveProfile: "Lưu hồ sơ",
+          emergencyEyebrow: "HỖ TRỢ KHẨN CẤP",
+          emergencySub: "Chọn tình huống. Gọi 115 trước, rồi làm theo bước.",
+          emStroke: "Nghi ngờ đột quỵ",
+          emStrokeDesc: "Mặt xệ, yếu tay, nói khó.",
+          emCPR: "Không đáp ứng / Không thở",
+          emCPRDesc: "Không đáp ứng, không thở bình thường.",
+          emChoking: "Hóc dị vật",
+          emChokingDesc: "Không nói, ho hoặc thở được.",
+          emGeneralNote: "Nếu nguy hiểm đến tính mạng, gọi 115 ngay.",
+          callEmergency: "Gọi 115",
+          callFirst: "1. Gọi 115 trước",
+          callFirstText: "Trong khi chờ, làm theo các bước dưới.",
+          backToSituations: "← Quay lại",
+          relatedLesson: "Bài học liên quan",
+          errorName: "Vui lòng nhập họ tên.",
+          errorAge: "Tuổi từ 1–120.",
+          errorHeight: "Chiều cao không hợp lệ.",
+          errorWeight: "Cân nặng không hợp lệ.",
+          profileChoiceTitle: "Trước khi bắt đầu",
+          profileChoiceText:
+            "Profile giúp kết quả tốt hơn. Có thể bỏ qua nhưng kết quả kém chính xác hơn.",
+          skipProfile: "Bỏ qua Profile",
+          fillProfile: "Điền Profile",
+          callTitle: "Gọi 115",
+          callText:
+            "Đây là prototype. Khẩn cấp thật hãy gọi 115 trên điện thoại.",
+          ok: "OK",
+          profileSaved: "Đã lưu hồ sơ!",
+          guest: "Khách",
+          checkInProgress:
+            "⚠️ Bạn đang trong Health Check. Thoát sẽ mất tiến trình.",
+          exitTitle: "Thoát kiểm tra?",
+          exitText:
+            "Bạn đang kiểm tra giữa chừng. Thoát sẽ xóa vùng đã chọn, câu trả lời và tiến trình.",
+          stay: "Ở lại",
+          leaveAnyway: "Vẫn thoát",
+        },
+      };
+
+      function setCheckActive(active) {
+        isHealthCheckActive = active;
+        document.getElementById("sidebar").classList.toggle("locked", active);
+        document
+          .getElementById("checkLockBanner")
+          .classList.toggle("show", active);
+      }
+      function tryNavigate(pageId) {
+        if (isHealthCheckActive && pageId !== "health-check") {
+          pendingNavigate = pageId;
+          showModal("exitCheckModal");
+          return;
+        }
+        openPage(pageId);
+      }
+      function tryNavigateEmergency() {
+        if (isHealthCheckActive) {
+          pendingNavigate = "emergency";
+          showModal("exitCheckModal");
+          return;
+        }
+        openEmergency();
+      }
+      function requestExitCheck(pageId) {
+        pendingNavigate = pageId || "home";
+        showModal("exitCheckModal");
+      }
+      function confirmExitCheck() {
+        closeModal("exitCheckModal");
+        clearHealthCheckData();
+        setCheckActive(false);
+        const dest = pendingNavigate || "home";
+        pendingNavigate = null;
+        if (dest === "emergency") openEmergency();
+        else openPage(dest);
+      }
+      function finishCheckAndGo(pageId) {
+        setCheckActive(false);
+        clearHealthCheckData();
+        openPage(pageId);
+      }
+      function clearHealthCheckData() {
+        selectedBodyArea = "";
+        aiChatStep = 0;
+        aiAnswers = [];
+        aiFinished = false;
+        stopCamera();
+        document
+          .querySelectorAll(".body-part")
+          .forEach((p) => p.classList.remove("selected"));
+        document
+          .querySelectorAll(".area-chip")
+          .forEach((c) => c.classList.remove("active"));
+      }
+
+      function toggleMobileSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("sidebarOverlay").classList.toggle("active");
+      }
+      function closeMobileSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("sidebarOverlay").classList.remove("active");
+      }
+      function showModal(id) {
+        document.getElementById(id).classList.add("show");
+      }
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("show");
+      }
+      function showMessage(title, text) {
+        document.getElementById("messageModalTitle").innerText = title;
+        document.getElementById("messageModalText").innerText = text;
+        showModal("messageModal");
+      }
+
+      function changeLanguage(lang) {
+        currentLang = lang;
+        document
+          .getElementById("langEN")
+          .classList.toggle("active", lang === "en");
+        document
+          .getElementById("langVI")
+          .classList.toggle("active", lang === "vi");
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (translations[lang][key]) el.innerText = translations[lang][key];
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+          const key = el.getAttribute("data-i18n-placeholder");
+          if (translations[lang][key]) el.placeholder = translations[lang][key];
+        });
+        if (selectedBodyArea)
+          document.getElementById("selectedDisplay").innerText =
+            AREA_LABELS[lang][selectedBodyArea];
+        else
+          document.getElementById("selectedDisplay").innerText =
+            translations[lang].noAreaSelected;
+        renderDiseaseGrid();
+        renderHistory();
+        const n = document.getElementById("topUserName").innerText;
+        if (n === "Guest" || n === "Khách")
+          document.getElementById("topUserName").innerText =
+            translations[lang].guest;
+      }
+
+      function openPage(pageId) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        const target = document.getElementById("page-" + pageId);
+        if (target) target.classList.add("active");
+        document.querySelectorAll(".sidebar .nav-item").forEach((btn) => {
+          btn.classList.toggle(
+            "active",
+            btn.getAttribute("data-page") === pageId,
+          );
+        });
+        const activeNav = document.querySelector(
+          `.sidebar .nav-item[data-page="${pageId}"]`,
+        );
+        if (activeNav) {
+          document.getElementById("pageTitle").innerText =
+            activeNav.querySelector("[data-i18n]")?.innerText || pageId;
+        }
+        closeMobileSidebar();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function startHealthCheck() {
+        if (!isProfileCompleted) {
+          showModal("profileChoiceModal");
+          return;
+        }
+        beginHealthCheckFlow();
+      }
+      function goToFillProfile() {
+        closeModal("profileChoiceModal");
+        openPage("profile");
+      }
+      function skipProfileAndStart() {
+        closeModal("profileChoiceModal");
+        skippedProfile = true;
+        isProfileCompleted = true;
+        beginHealthCheckFlow();
+      }
+      function beginHealthCheckFlow() {
+        clearHealthCheckData();
+        document.getElementById("selectedDisplay").innerText =
+          translations[currentLang].noAreaSelected;
+        document.getElementById("btnToCamera").disabled = true;
+        document.getElementById("btnToResult").disabled = true;
+        document.getElementById("resultsLimitedNote").classList.remove("show");
+        setCheckActive(true);
+        openPage("health-check");
+      }
+
+      function selectBodyPart(el) {
+        selectBodyByName(el.getAttribute("data-area"));
+      }
+      function selectBodyByName(area) {
+        selectedBodyArea = area;
+        document
+          .querySelectorAll(".body-part")
+          .forEach((p) => p.classList.remove("selected"));
+        document
+          .querySelectorAll(".area-chip")
+          .forEach((c) => c.classList.remove("active"));
+        document
+          .querySelectorAll(`.body-part[data-area="${area}"]`)
+          .forEach((p) => p.classList.add("selected"));
+        document
+          .querySelectorAll(`.area-chip[data-area="${area}"]`)
+          .forEach((c) => c.classList.add("active"));
+        document.getElementById("selectedDisplay").innerText =
+          AREA_LABELS[currentLang][area];
+        document.getElementById("btnToCamera").disabled = false;
+      }
+      function goToCamera() {
+        if (!selectedBodyArea) return;
+        openPage("camera");
+      }
+
+      async function openCamera() {
+        stopCamera();
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: currentFacingMode } },
+            audio: false,
+          });
+          const video = document.getElementById("cameraVideo");
+          video.srcObject = mediaStream;
+          video.style.transform =
+            currentFacingMode === "user" ? "scaleX(-1)" : "none";
+          document.getElementById("cameraBox").classList.add("camera-active");
+          document.getElementById("cameraBox").classList.remove("has-image");
+          document.getElementById("cameraPlaceholder").style.display = "none";
+          document.getElementById("cameraButton").style.display = "none";
+          document.getElementById("stopCameraButton").style.display =
+            "inline-flex";
+          document.getElementById("switchCameraBtn").style.display =
+            "inline-flex";
+          document.getElementById("cameraStatus").innerText =
+            currentLang === "vi"
+              ? "Camera đang hoạt động."
+              : "Camera is active.";
+        } catch (e) {
+          document.getElementById("cameraStatus").innerText =
+            currentLang === "vi"
+              ? "Không thể mở camera."
+              : "Cannot open camera.";
+        }
+      }
+      function switchCamera() {
+        currentFacingMode =
+          currentFacingMode === "user" ? "environment" : "user";
+        openCamera();
+      }
+      function stopCamera() {
+        if (mediaStream) {
+          mediaStream.getTracks().forEach((t) => t.stop());
+          mediaStream = null;
+        }
+        document.getElementById("cameraVideo").srcObject = null;
+        document.getElementById("cameraBox").classList.remove("camera-active");
+        document.getElementById("cameraPlaceholder").style.display = "block";
+        document.getElementById("cameraButton").style.display = "inline-flex";
+        document.getElementById("stopCameraButton").style.display = "none";
+        document.getElementById("switchCameraBtn").style.display = "none";
+        document.getElementById("cameraStatus").innerText =
+          translations[currentLang].cameraStatusOff;
+      }
+      function handlePhotoUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        stopCamera();
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          document.getElementById("uploadedImage").src = ev.target.result;
+          document.getElementById("cameraBox").classList.add("has-image");
+          document.getElementById("cameraPlaceholder").style.display = "none";
+          document.getElementById("cameraStatus").innerText =
+            currentLang === "vi" ? "Đã tải ảnh lên." : "Photo uploaded.";
+        };
+        reader.readAsDataURL(file);
+      }
+
+      let allSymptoms = [];
+      let selectedSymptomIds = [];
+
+      async function goToAIChat() {
+        stopCamera();
+        openPage("ai-chat");
+        document.getElementById("aiChatMessages").innerHTML = "";
+        document.getElementById("quickReplies").innerHTML = "";
+        selectedSymptomIds = [];
+        aiAnswers = [];
+        aiFinished = false;
+        document.getElementById("btnToResult").disabled = true;
+
+        const botMsg = document.createElement("div");
+        botMsg.className = "ai-msg bot";
+        botMsg.innerText =
+          currentLang === "vi"
+            ? "Bạn đang gặp những triệu chứng nào? (có thể chọn nhiều)"
+            : "Which symptoms are you experiencing? (you can pick more than one)";
+        document.getElementById("aiChatMessages").appendChild(botMsg);
+
+        try {
+          const res = await fetch("http://127.0.0.1:8000/api/symptoms");
+          allSymptoms = await res.json();
+          renderSymptomChoices();
+        } catch (err) {
+          console.error("Không lấy được danh sách triệu chứng:", err);
+        }
+      }
+
+      function renderSymptomChoices() {
+        const quick = document.getElementById("quickReplies");
+        quick.innerHTML = "";
+        allSymptoms.forEach((s) => {
+          const btn = document.createElement("button");
+          btn.className = "quick-reply";
+          btn.innerText = s.name;
+          btn.onclick = () => toggleSymptom(s.id, btn);
+          quick.appendChild(btn);
+        });
+
+        const doneBtn = document.createElement("button");
+        doneBtn.className = "quick-reply";
+        doneBtn.innerText =
+          currentLang === "vi" ? "✓ Xong, tìm bệnh" : "✓ Done, find diseases";
+        doneBtn.onclick = finishSymptomSelection;
+        quick.appendChild(doneBtn);
+      }
+
+      function toggleSymptom(id, btn) {
+        const index = selectedSymptomIds.indexOf(id);
+        if (index === -1) {
+          selectedSymptomIds.push(id);
+          btn.style.background = "var(--green)";
+          btn.style.color = "#fff";
+        } else {
+          selectedSymptomIds.splice(index, 1);
+          btn.style.background = "";
+          btn.style.color = "";
+        }
+      }
+
+      function finishSymptomSelection() {
+        if (selectedSymptomIds.length === 0) {
+          showMessage(
+            currentLang === "vi"
+              ? "Chưa chọn triệu chứng"
+              : "No symptoms selected",
+            currentLang === "vi"
+              ? "Vui lòng chọn ít nhất 1 triệu chứng."
+              : "Please select at least 1 symptom.",
+          );
+          return;
+        }
+        const chosenNames = allSymptoms
+          .filter((s) => selectedSymptomIds.includes(s.id))
+          .map((s) => s.name);
+        addUserMessage(chosenNames.join(", "));
+        aiAnswers = chosenNames;
+        document.getElementById("quickReplies").innerHTML = "";
+        aiFinished = true;
+        document.getElementById("btnToResult").disabled = false;
+      }
+      function askNextAIQuestion() {
+        const areaLabel =
+          AREA_LABELS[currentLang][selectedBodyArea] || selectedBodyArea;
+        const q = AI_QUESTIONS[currentLang][aiChatStep].replace(
+          "{area}",
+          areaLabel,
+        );
+        const botMsg = document.createElement("div");
+        botMsg.className = "ai-msg bot";
+        botMsg.innerHTML = q;
+        document.getElementById("aiChatMessages").appendChild(botMsg);
+        document.getElementById("aiChatMessages").scrollTop = 9999;
+        const quick = document.getElementById("quickReplies");
+        quick.innerHTML = "";
+        if (aiChatStep < 4) {
+          (QUICK_OPTIONS[currentLang][aiChatStep] || []).forEach((opt) => {
+            const btn = document.createElement("button");
+            btn.className = "quick-reply";
+            btn.innerText = opt;
+            btn.onclick = () => answerWithQuick(opt);
+            quick.appendChild(btn);
+          });
+        } else {
+          aiFinished = true;
+          document.getElementById("btnToResult").disabled = false;
+        }
+      }
+      function answerWithQuick(text) {
+        addUserMessage(text);
+        aiAnswers.push(text);
+        document.getElementById("quickReplies").innerHTML = "";
+        aiChatStep++;
+        if (aiChatStep < AI_QUESTIONS[currentLang].length)
+          setTimeout(() => askNextAIQuestion(), 400);
+      }
+      function sendAIChatMessage() {
+        const input = document.getElementById("aiChatInput");
+        const text = input.value.trim();
+        if (!text || aiFinished) return;
+        addUserMessage(text);
+        aiAnswers.push(text);
+        input.value = "";
+        document.getElementById("quickReplies").innerHTML = "";
+        aiChatStep++;
+        if (aiChatStep < AI_QUESTIONS[currentLang].length)
+          setTimeout(() => askNextAIQuestion(), 400);
+        else {
+          aiFinished = true;
+          document.getElementById("btnToResult").disabled = false;
+        }
+      }
+      function addUserMessage(text) {
+        const msg = document.createElement("div");
+        msg.className = "ai-msg user";
+        msg.innerText = text;
+        document.getElementById("aiChatMessages").appendChild(msg);
+        document.getElementById("aiChatMessages").scrollTop = 9999;
+      }
+
+      async function goToResult() {
+        const areaLabel =
+          AREA_LABELS[currentLang][selectedBodyArea] || selectedBodyArea;
+
+        let diseases = [];
+        try {
+          const res = await fetch(
+            "http://127.0.0.1:8000/api/diseases-by-symptoms?symptom_ids=" +
+              selectedSymptomIds.join(","),
+          );
+          diseases = await res.json();
+        } catch (err) {
+          console.error("Không lấy được danh sách bệnh:", err);
+        }
+
+        if (diseases.length === 0) {
+          document.getElementById("resultExplanation").innerText =
+            currentLang === "vi"
+              ? "Không tìm thấy bệnh nào khớp với các triệu chứng đã chọn."
+              : "No matching condition found for the selected symptoms.";
+          document.getElementById("resultAction").innerText = "-";
+          document.getElementById("resultSupporting").innerHTML = "";
+        } else {
+          const topDisease = diseases[0];
+          document.getElementById("resultExplanation").innerText =
+            topDisease.name + " — " + topDisease.description;
+          document.getElementById("resultAction").innerText =
+            topDisease.treatment;
+          document.getElementById("resultSupporting").innerHTML = diseases
+            .map(
+              (d) =>
+                `<li>${d.name} (${currentLang === "vi" ? "khớp" : "matched"} ${d.match_count} ${currentLang === "vi" ? "triệu chứng" : "symptom(s)"})</li>`,
+            )
+            .join("");
+        }
+
+        document.getElementById("resultUncertainty").innerText =
+          currentLang === "vi"
+            ? "AI không chẩn đoán y khoa. Chỉ thông tin giáo dục tham khảo."
+            : "AI does not diagnose. Educational reference only.";
+        document.getElementById("resultWarnings").innerHTML = (
+          currentLang === "vi"
+            ? ["Khó thở nặng", "Đau ngực dữ dội", "Ngất"]
+            : ["Severe shortness of breath", "Severe chest pain", "Fainting"]
+        )
+          .map((w) => `<li>${w}</li>`)
+          .join("");
+        document.getElementById("facilitiesCard").style.display = "none";
+        document.getElementById("resultBody").innerText = areaLabel;
+        document.getElementById("resultAnswers").innerText =
+          aiAnswers.join(" · ") || "-";
+        document
+          .getElementById("resultsLimitedNote")
+          .classList.toggle("show", skippedProfile);
+        setCheckActive(false);
+        openPage("results");
+      }
+
+      function renderDiseaseGrid() {
+        document.getElementById("diseaseGrid").innerHTML = DISEASES.map((d) => {
+          const t = d[currentLang];
+          return `<div class="card disease-card" onclick="openDiseaseDetail('${d.id}')"><h3>${t.name}</h3><p class="muted">${t.desc}</p><span class="disease-tag">${TAG_I18N[currentLang][d.tag]}</span></div>`;
+        }).join("");
+      }
+      function filterDiseases() {
+        const q = document
+          .getElementById("diseaseSearchInput")
+          .value.toLowerCase();
+        document.querySelectorAll("#diseaseGrid .disease-card").forEach((c) => {
+          c.style.display = c.textContent.toLowerCase().includes(q)
+            ? "block"
+            : "none";
+        });
+      }
+      function openDiseaseDetail(id) {
+        const d = DISEASES.find((x) => x.id === id);
+        if (!d) return;
+        document.getElementById("detailTitle").innerText = d[currentLang].name;
+        document.getElementById("detailContent").innerText =
+          d[currentLang].detail;
+        document.getElementById("diseaseDetailCard").style.display = "block";
+      }
+      function closeDiseaseDetail() {
+        document.getElementById("diseaseDetailCard").style.display = "none";
+      }
+      function renderHistory() {
+        document.getElementById("historyList").innerHTML = HISTORY_DATA.map(
+          (h) => {
+            const t = h[currentLang];
+            return `<div class="history-item"><div><strong>${t.date}</strong><p class="muted" style="margin:3px 0 0;font-size:13px">${t.note}</p></div><span class="history-badge">${t.badge}</span></div>`;
+          },
+        ).join("");
+      }
+      function openLesson(id) {
+        document.getElementById("lessonContent").innerHTML =
+          LESSONS[id][currentLang];
+        document.getElementById("lessonDetail").classList.add("show");
+      }
+      function closeLesson() {
+        document.getElementById("lessonDetail").classList.remove("show");
+      }
+      function requestLocation() {
+        document.getElementById("locationStatus").innerText =
+          currentLang === "vi" ? "Đang lấy vị trí..." : "Getting location...";
+      }
+      function openEmergency() {
+        document.getElementById("emSelectView").style.display = "block";
+        document.getElementById("emDetailView").classList.remove("show");
+        openPage("emergency");
+      }
+      function openEmGuide(type) {
+        document.getElementById("emGuideContent").innerHTML =
+          EM_GUIDES[type][currentLang];
+        document.getElementById("emSelectView").style.display = "none";
+        document.getElementById("emDetailView").classList.add("show");
+      }
+      function backToEmSelect() {
+        document.getElementById("emDetailView").classList.remove("show");
+        document.getElementById("emSelectView").style.display = "block";
+      }
+      function handleAvatarUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          document.getElementById("avatarPreview").innerHTML =
+            `<img src="${ev.target.result}"><input type="file" accept="image/*" onchange="handleAvatarUpload(event)">`;
+          document.getElementById("topAvatar").innerHTML =
+            `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+        };
+        reader.readAsDataURL(file);
+      }
+      function validateProfile() {
+        const name = document.getElementById("profileName").value.trim();
+        const age = document.getElementById("profileAge").value.trim();
+        let valid = true;
+        if (!name) {
+          document.getElementById("profileName").classList.add("error");
+          document.getElementById("nameError").classList.add("show");
+          valid = false;
+        } else {
+          document.getElementById("profileName").classList.remove("error");
+          document.getElementById("nameError").classList.remove("show");
+        }
+        const ageNum = Number(age);
+        if (!age || isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
+          document.getElementById("profileAge").classList.add("error");
+          document.getElementById("ageError").classList.add("show");
+          valid = false;
+        } else {
+          document.getElementById("profileAge").classList.remove("error");
+          document.getElementById("ageError").classList.remove("show");
+        }
+        document.getElementById("btnSaveProfile").disabled = !valid;
+        return valid;
+      }
+      function saveProfile() {
+        if (!validateProfile()) return;
+        const name = document.getElementById("profileName").value.trim();
+        isProfileCompleted = true;
+        skippedProfile = false;
+        document.getElementById("topUserName").innerText = name;
+        if (!document.getElementById("topAvatar").querySelector("img"))
+          document.getElementById("topAvatar").innerText = name
+            .charAt(0)
+            .toUpperCase();
+        showMessage(
+          currentLang === "vi" ? "Thành công" : "Success",
+          translations[currentLang].profileSaved,
+        );
+      }
+
+      loadDiseasesFromAPI();
+      renderHistory();
+      document
+        .getElementById("aiChatInput")
+        .addEventListener("keypress", (e) => {
+          if (e.key === "Enter") sendAIChatMessage();
+        });
+    </script>
+  </body>
+</html>
