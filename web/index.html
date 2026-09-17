@@ -1200,7 +1200,7 @@
 
       async function loadDiseasesFromAPI() {
         try {
-          const res = await fetch("http://127.0.0.1:8000/api/diseases");
+          const res = await fetch("https://minions-qtug.onrender.com/api/diseases");
           const data = await res.json();
           DISEASES = data.map((d) => ({
             id: "d" + d.id,
@@ -1920,7 +1920,7 @@
         document.getElementById("aiChatMessages").appendChild(botMsg);
 
         try {
-          const res = await fetch("http://127.0.0.1:8000/api/symptoms");
+          const res = await fetch("https://minions-qtug.onrender.com/api/symptoms");
           allSymptoms = await res.json();
           renderSymptomChoices();
         } catch (err) {
@@ -2047,7 +2047,7 @@
         let diseases = [];
         try {
           const res = await fetch(
-            "http://127.0.0.1:8000/api/diseases-by-symptoms?symptom_ids=" +
+            "https://minions-qtug.onrender.com/api/diseases-by-symptoms?symptom_ids=" +
               selectedSymptomIds.join(","),
           );
           diseases = await res.json();
