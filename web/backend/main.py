@@ -63,7 +63,10 @@ class AIAssessmentOutput(BaseModel):
     confidenceScore: float
     nextAction: NextAction
 
-@app.post("/api/v1/assessment/evaluate")
+@app.post(
+    "/api/v1/assessment/evaluate",
+    response_model=AIAssessmentOutput
+)
 def evaluate_assessment(data: AIAssessmentInput):
     symptoms = [s.lower() for s in data.userContext.primarySymptoms]
 
