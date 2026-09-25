@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from database import get_db
 import models
+from sqlalchemy import text
+from database import get_db, engine
 
 app = FastAPI()
 class UserContext(BaseModel):
@@ -207,6 +209,24 @@ def trang_chu():
 def lay_danh_sach_benh(db: Session = Depends(get_db)):
     ds_benh = db.query(models.Diseases).all()
     return ds_benh
+
+@app.get("/api/db-test")
+def test_database():
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+
+        return {
+            "ok": True,
+            "message": "Database connection works!"
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "error_type": type(e).__name__,
+            "message": str(e)[:500]
+        }
 
 @app.get("/api/symptoms")
 def lay_danh_sach_trieu_chung(db: Session = Depends(get_db)):
