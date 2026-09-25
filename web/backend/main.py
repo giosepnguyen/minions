@@ -9,6 +9,24 @@ import models
 from sqlalchemy import text
 from database import get_db, engine
 
+@app.get("/api/db-test")
+def test_database():
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+
+        return {
+            "ok": True,
+            "message": "Database connection works!"
+        }
+
+    except Exception as e:
+        return {
+            "ok": False,
+            "error_type": type(e).__name__,
+            "message": str(e)[:500]
+        }
+
 app = FastAPI()
 class UserContext(BaseModel):
     userId: str
