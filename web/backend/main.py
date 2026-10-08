@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,6 +8,8 @@ from database import get_db
 import models
 
 app = FastAPI()
+
+
 class UserContext(BaseModel):
     userId: str
     age: int
@@ -26,6 +28,7 @@ class AIAssessmentInput(BaseModel):
     sessionId: str
     userContext: UserContext
     conversationHistory: List[ConversationMessage]
+
 
 class Question(BaseModel):
     id: str
@@ -63,19 +66,36 @@ class AIAssessmentOutput(BaseModel):
     confidenceScore: float
     nextAction: NextAction
 
-@app.post(
-    "/api/v1/assessment/evaluate",
-    response_model=AIAssessmentOutput
-)
-def evaluate_assessment(data: AIAssessmentInput):
-    symptoms = [s.lower() for s in data.userContext.primarySymptoms]
 
+@app.post("/mock-ai/assessment", response_model=AIAssessmentOutput)
+def mock_ai_assessment(data: AIAssessmentInput):
+    symptoms = [s.lower() for s in data.userContext.primarySymptoms]
     conversation_text = " ".join(
         message.content.lower()
         for message in data.conversationHistory
     )
 
-    # MOCK 3: Emergency Redirection
+    # Error scenario: AI service unavailable
+    if data.sessionId == "TEST_AI_SERVICE_ERROR":
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "code": "AI_SERVICE_ERROR",
+                "message": "AI service is temporarily unavailable"
+            }
+        )
+
+    # Error scenario: unexpected internal error
+    if data.sessionId == "TEST_INTERNAL_ERROR":
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "code": "INTERNAL_ERROR",
+                "message": "An unexpected error occurred"
+            }
+        )
+
+    # Scenario 3: EMERGENCY_REDIRECTIONS
     emergency_keywords = [
         "severe chest pain",
         "chest pain",
@@ -123,19 +143,18 @@ def evaluate_assessment(data: AIAssessmentInput):
             }
         }
 
-    # MOCK 2: Assessment Completed
+    # Scenario 2: COMPLETED
     completed_keywords = [
-        "2 days",
-        "2 day",
-        "2 days ago",
-        "2 ngày",
-        "2 hôm"
+        "2 days", "2 day", "2 days ago", "2 ngày", "2 hôm"
     ]
 
     has_completed_data = (
         any("fever" in symptom for symptom in symptoms)
         and any("headache" in symptom for symptom in symptoms)
-        and any(keyword in conversation_text for keyword in completed_keywords)
+        and any(
+            keyword in conversation_text
+            for keyword in completed_keywords
+        )
     )
 
     if has_completed_data:
@@ -171,7 +190,24 @@ def evaluate_assessment(data: AIAssessmentInput):
             }
         }
 
-    # MOCK 1: Needs Clarification
+    # Scenario 4: IN_PROGRESS
+    if any("cough" in symptom for symptom in symptoms):
+        return {
+            "sessionId": data.sessionId,
+            "status": "IN_PROGRESS",
+            "confidenceScore": 0.30,
+            "nextAction": {
+                "type": "QUESTION",
+                "question": {
+                    "id": "q_severity",
+                    "prompt": "Mức độ ho của bạn như thế nào?",
+                    "inputType": "SINGLE_CHOICE",
+                    "options": ["Nhẹ", "Vừa", "Nặng"]
+                }
+            }
+        }
+
+    # Scenario 1: NEEDS_CLARIFICATION
     return {
         "sessionId": data.sessionId,
         "status": "NEEDS_CLARIFICATION",
@@ -180,54 +216,90 @@ def evaluate_assessment(data: AIAssessmentInput):
             "type": "QUESTION",
             "question": {
                 "id": "q_duration",
-                "prompt": "How long have you been experiencing these symptoms?",
+                "prompt": "Bạn đã có các triệu chứng này bao lâu rồi?",
                 "inputType": "SINGLE_CHOICE",
                 "options": [
-                    "Less than 24 hours",
-                    "1-3 days",
-                    "4-7 days",
-                    "More than 1 week"
+                    "Dưới 24 giờ",
+                    "1–3 ngày",
+                    "4–7 ngày",
+                    "Hơn 1 tuần"
                 ]
             }
         }
     }
 
+
+@app.post("/api/v1/assessment/evaluate", response_model=AIAssessmentOutput)
+def evaluate_assessment(data: AIAssessmentInput):
+    # Keep the existing Health Check endpoint while routing its
+    # assessment evaluation through the Mock AI implementation.
+    return mock_ai_assessment(data)
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def trang_chu():
     return {"message": "Backend đang chạy!"}
+
 
 @app.get("/api/diseases")
 def lay_danh_sach_benh(db: Session = Depends(get_db)):
     ds_benh = db.query(models.Diseases).all()
     return ds_benh
 
+
 @app.get("/api/symptoms")
 def lay_danh_sach_trieu_chung(db: Session = Depends(get_db)):
     return db.query(models.Symptoms).all()
 
+
 @app.get("/api/diseases-by-symptoms")
-def tim_benh_theo_trieu_chung(symptom_ids: str, db: Session = Depends(get_db)):
-    ids = [int(x) for x in symptom_ids.split(",") if x.strip().isdigit()]
+def tim_benh_theo_trieu_chung(
+    symptom_ids: str,
+    db: Session = Depends(get_db)
+):
+    ids = [
+        int(x)
+        for x in symptom_ids.split(",")
+        if x.strip().isdigit()
+    ]
+
     if not ids:
         return []
 
     ket_qua = (
-        db.query(models.Diseases, func.count(models.DiseaseSymptoms.disease_id).label("so_khop"))
-        .join(models.DiseaseSymptoms, models.DiseaseSymptoms.disease_id == models.Diseases.id)
-        .filter(models.DiseaseSymptoms.symptom_id.in_(ids))
+        db.query(
+            models.Diseases,
+            func.count(
+                models.DiseaseSymptoms.disease_id
+            ).label("so_khop")
+        )
+        .join(
+            models.DiseaseSymptoms,
+            models.DiseaseSymptoms.disease_id == models.Diseases.id
+        )
+        .filter(
+            models.DiseaseSymptoms.symptom_id.in_(ids)
+        )
         .group_by(models.Diseases.id)
-        .order_by(func.count(models.DiseaseSymptoms.disease_id).desc())
+        .order_by(
+            func.count(
+                models.DiseaseSymptoms.disease_id
+            ).desc()
+        )
         .all()
     )
 
     danh_sach = []
+
     for benh, so_khop in ket_qua:
         danh_sach.append({
             "id": benh.id,
@@ -237,4 +309,5 @@ def tim_benh_theo_trieu_chung(symptom_ids: str, db: Session = Depends(get_db)):
             "treatment": benh.treatment,
             "match_count": so_khop,
         })
+
     return danh_sach
