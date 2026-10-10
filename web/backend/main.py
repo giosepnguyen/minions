@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
@@ -75,7 +74,7 @@ class AIAssessmentOutput(BaseModel):
 
 
 # =========================================================
-# 2. HELPER FUNCTIONS
+# 2. QUESTION DEFINITIONS
 # =========================================================
 
 DURATION_QUESTION = {
@@ -94,9 +93,48 @@ SEVERITY_QUESTION = {
     "id": "q_severity",
     "prompt": "Mức độ triệu chứng của bạn như thế nào?",
     "inputType": "SINGLE_CHOICE",
-    "options": ["Nhẹ", "Vừa", "Nặng"],
+    "options": [
+        "Nhẹ",
+        "Vừa",
+        "Nặng",
+    ],
 }
 
+PROGRESSION_QUESTION = {
+    "id": "q_progression",
+    "prompt": "Triệu chứng của bạn đang nặng hơn, giữ nguyên hay đỡ hơn?",
+    "inputType": "SINGLE_CHOICE",
+    "options": [
+        "Nặng hơn",
+        "Giữ nguyên",
+        "Đỡ hơn",
+    ],
+}
+
+ASSOCIATED_SYMPTOMS_QUESTION = {
+    "id": "q_associated_symptoms",
+    "prompt": "Bạn có sốt, mệt, buồn nôn không?",
+    "inputType": "SINGLE_CHOICE",
+    "options": [
+        "Có sốt",
+        "Có mệt",
+        "Có buồn nôn",
+        "Có nhiều triệu chứng trên",
+        "Không có triệu chứng nào trên",
+    ],
+}
+
+ASSESSMENT_QUESTIONS = [
+    DURATION_QUESTION,
+    SEVERITY_QUESTION,
+    PROGRESSION_QUESTION,
+    ASSOCIATED_SYMPTOMS_QUESTION,
+]
+
+
+# =========================================================
+# 3. RESPONSE HELPERS
+# =========================================================
 
 def question_response(
     session_id: str,
@@ -110,21 +148,27 @@ def question_response(
         "nextAction": {
             "type": "QUESTION",
             "question": question,
+            "assessmentResult": None,
         },
     }
 
 
 def completed_response(
     session_id: str,
-    duration: str,
-    severity: str,
+    answers: dict,
 ) -> dict:
+    duration = answers["q_duration"]
+    severity = answers["q_severity"]
+    progression = answers["q_progression"]
+    associated_symptoms = answers["q_associated_symptoms"]
+
     return {
         "sessionId": session_id,
         "status": "COMPLETED",
         "confidenceScore": 0.60,
         "nextAction": {
             "type": "RESULT",
+            "question": None,
             "assessmentResult": {
                 "triageLevel": "MEDIUM",
                 "possibleConditions": [],
@@ -136,6 +180,8 @@ def completed_response(
                 "supportingFactors": [
                     f"Thời gian triệu chứng: {duration}",
                     f"Mức độ triệu chứng: {severity}",
+                    f"Diễn biến triệu chứng: {progression}",
+                    f"Triệu chứng kèm theo: {associated_symptoms}",
                 ],
                 "recommendations": [
                     "Theo dõi diễn biến triệu chứng.",
@@ -147,6 +193,7 @@ def completed_response(
                     "Đau ngực dữ dội",
                     "Ngất hoặc mất ý thức",
                 ],
+                "emergencyFacilities": None,
             },
         },
     }
@@ -159,12 +206,15 @@ def emergency_response(session_id: str) -> dict:
         "confidenceScore": 1.0,
         "nextAction": {
             "type": "REDIRECT",
+            "question": None,
             "assessmentResult": {
                 "triageLevel": "CRITICAL",
+                "possibleConditions": [],
                 "explanation": (
                     "Thông tin được cung cấp có thể cho thấy "
                     "tình trạng cấp cứu cần được đánh giá ngay."
                 ),
+                "supportingFactors": [],
                 "recommendations": [
                     "Gọi cấp cứu 115 tại Việt Nam nếu đang có "
                     "triệu chứng nguy hiểm.",
@@ -178,13 +228,68 @@ def emergency_response(session_id: str) -> dict:
                     "Khó thở nghiêm trọng",
                     "Mất ý thức",
                 ],
+                "emergencyFacilities": None,
             },
         },
     }
 
 
 # =========================================================
-# 3. MOCK AI ASSESSMENT
+# 4. CONVERSATION HISTORY HELPERS
+# =========================================================
+
+def identify_question(prompt: str):
+    """
+    Nhận diện câu hỏi của Backend dựa trên nội dung
+    message role=assistant trong conversationHistory.
+    """
+    normalized_prompt = prompt.strip().lower()
+
+    for index, question in enumerate(ASSESSMENT_QUESTIONS):
+        if question["prompt"].strip().lower() in normalized_prompt:
+            return index
+
+    return None
+
+
+def collect_question_answers(history: list) -> dict:
+    """
+    Thu thập câu trả lời gắn với từng câu hỏi.
+
+    Mỗi câu trả lời được xác định bằng message user xuất hiện
+    sau câu hỏi assistant tương ứng và trước câu hỏi assistant
+    tiếp theo.
+    """
+    answers = {}
+
+    for index, message in enumerate(history):
+        if message.role.lower() != "assistant":
+            continue
+
+        question_index = identify_question(message.content)
+
+        if question_index is None:
+            continue
+
+        question_id = ASSESSMENT_QUESTIONS[question_index]["id"]
+
+        # Tìm câu trả lời user kế tiếp trước khi assistant
+        # đưa ra một câu hỏi khác.
+        for next_message in history[index + 1:]:
+            role = next_message.role.lower()
+
+            if role == "assistant":
+                break
+
+            if role == "user" and next_message.content.strip():
+                answers[question_id] = next_message.content.strip()
+                break
+
+    return answers
+
+
+# =========================================================
+# 5. MOCK AI ASSESSMENT
 # =========================================================
 
 @app.post(
@@ -194,6 +299,7 @@ def emergency_response(session_id: str) -> dict:
 def mock_ai_assessment(data: AIAssessmentInput):
 
     session_id = data.sessionId
+    history = data.conversationHistory
 
     # Test case: AI service unavailable
     if session_id == "TEST_AI_SERVICE_ERROR":
@@ -217,7 +323,6 @@ def mock_ai_assessment(data: AIAssessmentInput):
 
     # -----------------------------------------------------
     # A. Emergency screening
-    # Check user-provided information, not assistant prompts.
     # -----------------------------------------------------
 
     emergency_keywords = [
@@ -238,11 +343,13 @@ def mock_ai_assessment(data: AIAssessmentInput):
 
     user_messages = [
         message.content.strip()
-        for message in data.conversationHistory
+        for message in history
         if message.role.lower() == "user"
+        and message.content.strip()
     ]
 
     user_text = " ".join(user_messages).lower()
+
     symptoms = [
         symptom.strip().lower()
         for symptom in data.userContext.primarySymptoms
@@ -258,10 +365,8 @@ def mock_ai_assessment(data: AIAssessmentInput):
         return emergency_response(session_id)
 
     # -----------------------------------------------------
-    # B. Determine which question was answered most recently
+    # B. Identify the latest assistant question
     # -----------------------------------------------------
-
-    history = data.conversationHistory
 
     last_assistant_index = None
 
@@ -270,82 +375,86 @@ def mock_ai_assessment(data: AIAssessmentInput):
             last_assistant_index = index
             break
 
-    last_assistant_prompt = ""
-
-    if last_assistant_index is not None:
-        last_assistant_prompt = (
-            history[last_assistant_index].content.strip().lower()
-        )
-
-    # Find user answers after the most recent assistant message.
-    # This avoids relying on the total number of old answers.
-    answers_after_last_question = []
-
-    if last_assistant_index is not None:
-        answers_after_last_question = [
-            message.content.strip()
-            for message in history[last_assistant_index + 1:]
-            if message.role.lower() == "user"
-            and message.content.strip()
-        ]
-
-    # If the most recent assistant message was the duration
-    # question and the user answered it, ask about severity.
-    duration_prompt = DURATION_QUESTION["prompt"].lower()
-    severity_prompt = SEVERITY_QUESTION["prompt"].lower()
-
-    answered_duration = (
-        duration_prompt in last_assistant_prompt
-        and len(answers_after_last_question) > 0
-    )
-
-    answered_severity = (
-        severity_prompt in last_assistant_prompt
-        and len(answers_after_last_question) > 0
-    )
-
-    # Case 1: No duration answer has been given yet.
-    if not user_messages or (
-        last_assistant_index is not None
-        and duration_prompt in last_assistant_prompt
-        and not answers_after_last_question
-    ):
+    # No assessment question has been asked yet.
+    if last_assistant_index is None:
         return question_response(
             session_id,
             DURATION_QUESTION,
             0.45,
         )
 
-    # Case 2: Duration was answered; ask about severity.
-    if answered_duration:
+    last_assistant_message = history[last_assistant_index]
+    current_question_index = identify_question(
+        last_assistant_message.content
+    )
+
+    # Unexpected history: do not assume the assessment is complete.
+    if current_question_index is None:
         return question_response(
             session_id,
-            SEVERITY_QUESTION,
-            0.55,
+            DURATION_QUESTION,
+            0.45,
         )
 
-    # Case 3: Severity was answered; complete the mock assessment.
-    if answered_severity:
-        duration_answer = next(
-            (
-                message.content.strip()
-                for message in reversed(history[:last_assistant_index])
-                if message.role.lower() == "user"
-                and message.content.strip()
-            ),
-            "Chưa cung cấp",
-        )
+    # -----------------------------------------------------
+    # C. Check whether the current question has an answer
+    # -----------------------------------------------------
 
-        severity_answer = answers_after_last_question[-1]
+    answers_after_last_question = [
+        message.content.strip()
+        for message in history[last_assistant_index + 1:]
+        if message.role.lower() == "user"
+        and message.content.strip()
+    ]
 
-        return completed_response(
+    # The current question has not been answered.
+    if not answers_after_last_question:
+        return question_response(
             session_id,
-            duration_answer,
-            severity_answer,
+            ASSESSMENT_QUESTIONS[current_question_index],
+            0.45,
         )
 
-    # Fallback for an unexpected conversation state.
-    # Do not invent a medical conclusion.
+    # Collect answers from the complete conversation history.
+    answers = collect_question_answers(history)
+
+    # -----------------------------------------------------
+    # D. Ask the next question, if any
+    # -----------------------------------------------------
+
+    next_question_index = current_question_index + 1
+
+    if next_question_index < len(ASSESSMENT_QUESTIONS):
+        next_question = ASSESSMENT_QUESTIONS[next_question_index]
+
+        return question_response(
+            session_id,
+            next_question,
+            min(0.45 + 0.05 * next_question_index, 0.60),
+        )
+
+    # -----------------------------------------------------
+    # E. Complete only after all four answers are available
+    # -----------------------------------------------------
+
+    required_question_ids = [
+        question["id"]
+        for question in ASSESSMENT_QUESTIONS
+    ]
+
+    if all(question_id in answers for question_id in required_question_ids):
+        return completed_response(session_id, answers)
+
+    # History is incomplete. Do not fabricate missing answers.
+    for question in ASSESSMENT_QUESTIONS:
+        if question["id"] not in answers:
+            return question_response(
+                session_id,
+                question,
+                0.45,
+            )
+
+    # Defensive fallback.
     return question_response(
         session_id,
         DURATION_QUESTION,
@@ -354,7 +463,7 @@ def mock_ai_assessment(data: AIAssessmentInput):
 
 
 # =========================================================
-# 4. HEALTH CHECK ASSESSMENT API
+# 6. HEALTH CHECK ASSESSMENT API
 # =========================================================
 
 @app.post(
@@ -366,7 +475,7 @@ def evaluate_assessment(data: AIAssessmentInput):
 
 
 # =========================================================
-# 5. CORS
+# 7. CORS
 # =========================================================
 
 app.add_middleware(
@@ -379,7 +488,7 @@ app.add_middleware(
 
 
 # =========================================================
-# 6. BASIC API
+# 8. BASIC API
 # =========================================================
 
 @app.get("/")
@@ -388,7 +497,7 @@ def trang_chu():
 
 
 # =========================================================
-# 7. DATABASE APIs
+# 9. DATABASE APIs
 # =========================================================
 
 @app.get("/api/diseases")
