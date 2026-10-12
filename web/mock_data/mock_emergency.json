@@ -1,0 +1,28 @@
+{
+  "explanation": "CẢNH BÁO: Bạn đang có dấu hiệu khó thở cấp tính kèm đau tức ngực. Đây là tình trạng nguy hiểm cần được can thiệp y tế ngay lập tức.",
+  "supporting_factors": [
+    "Khó thở nghiêm trọng",
+    "Đau tức ngực dữ dội kéo dài"
+  ],
+  "uncertainty": "Đánh giá này do AI thực hiện và KHÔNG thay thế cho chẩn đoán y khoa chính thức từ bác sĩ.",
+  "recommended_action": "Hãy gọi ngay 115 hoặc nhờ người thân đưa bạn đến cơ sở y tế gần nhất lập tức!",
+  "emergency_facilities": [
+    {
+      "name": "Bệnh viện Hữu Nghị Việt Tiệp (Khoa Cấp cứu)",
+      "address": "Số 1 Phố Nhà Thương, P. Cát Dài, Q. Lê Chân, TP. Hải Phòng",
+      "phone": "0225 3700 436",
+      "distance": "1.2 km"
+    },
+    {
+      "name": "Bệnh viện Đa khoa Quốc tế Hải Phòng",
+      "address": "Số 124 Nguyễn Đức Cảnh, Q. Lê Chân, TP. Hải Phòng",
+      "phone": "0225 3955 888",
+      "distance": "1.8 km"
+    }
+  ],
+  "warning_signs": [
+    "Tím tái môi hoặc đầu ngón tay",
+    "Mất ý thức, vã mồ hôi lạnh hoặc ngất xỉu"
+  ],
+  "follow_up_questions": []
+}
