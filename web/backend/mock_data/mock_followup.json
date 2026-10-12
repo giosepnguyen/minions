@@ -1,0 +1,18 @@
+{
+  "explanation": "Dựa trên mô tả, triệu chứng sốt kèm đau họng của bạn có thể xuất phát từ viêm đường hô hấp trên hoặc cảm cúm thông thường.",
+  "supporting_factors": [
+    "Sốt nhẹ 38 độ C",
+    "Đau rát họng khi nuốt"
+  ],
+  "uncertainty": "Thông tin chỉ mang tính chất tham khảo, không thay thế khám bệnh lâm sàng.",
+  "recommended_action": "Nghỉ ngơi, uống đủ nước và tiếp tục theo dõi nhiệt độ cơ thể trong 24 giờ tới.",
+  "emergency_facilities": [],
+  "warning_signs": [
+    "Sốt cao liên tục trên 39 độ không hạ",
+    "Khó nuốt nặng hoặc khó thở"
+  ],
+  "follow_up_questions": [
+    "Bạn đã bị sốt và đau họng kéo dài bao nhiêu ngày rồi?",
+    "Bạn có kèm theo ho đờm, mất vị giác hay đau mỏi toàn thân không?"
+  ]
+}
