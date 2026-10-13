@@ -417,6 +417,8 @@ app.add_middleware(
         "https://vntgtranthieminh-sys.github.io",
         "http://localhost:300",
         "http://127.0.0.1:300",
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
     ],
     allow_credentials=False,
     allow_methods=["*"],
