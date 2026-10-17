@@ -414,7 +414,7 @@ def evaluate_assessment(data: AIAssessmentInput):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://vntgtranthieminh-sys.github.io",
+        "https://vntgtranthienminh-sys.github.io",
         "http://localhost:300",
         "http://127.0.0.1:300",
         "http://127.0.0.1:5500",
