@@ -37,7 +37,8 @@ def load_mock_json(filename: str) -> dict:
 # =========================================================
 class UserContext(BaseModel):
     userId: str
-    age: int
+    # Tuổi không bắt buộc: người dùng có thể bắt đầu Health Check mà không cần Profile.
+    age: Optional[int] = None
     gender: Optional[str] = None
     primarySymptoms: List[str]
     patientLocation: Optional[dict] = None
