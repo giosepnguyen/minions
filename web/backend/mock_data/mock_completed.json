@@ -1,0 +1,15 @@
+
+{
+  "status": "COMPLETED",
+  "urgency_level": "Moderate",
+  "assessment_result": {
+    "suspected_condition": "Viêm phế quản cấp",
+    "reasoning": "Dựa trên mô tả ho kéo dài, khạc đờm kèm các triệu chứng đau rát họng khi nuốt và sốt nhẹ bạn đã khai báo.",
+    "disease_overview": "Viêm phế quản cấp là tình trạng niêm mạc của đường thở bị viêm, thường gây ho và tăng tiết đờm.",
+    "next_steps": [
+      "Đến khám tại cơ sở y tế để được đánh giá phù hợp.",
+      "Uống đủ nước và nghỉ ngơi.",
+      "Tìm trợ giúp y tế kịp thời nếu xuất hiện khó thở hoặc ho ra máu."
+    ]
+  }
+}

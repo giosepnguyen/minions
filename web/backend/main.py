@@ -101,19 +101,10 @@ SEVERITY_QUESTION = {
         "Nặng",
     ],
 }
-PROGRESSION_QUESTION = {
-    "id": "q_progression",
-    "prompt": "Triệu chứng của bạn đang nặng hơn, giữ nguyên hay đỡ hơn?",
-    "inputType": "SINGLE_CHOICE",
-    "options": [
-        "Nặng hơn",
-        "Giữ nguyên",
-        "Đỡ hơn",
-    ],
-}
+
 ASSOCIATED_SYMPTOMS_QUESTION = {
     "id": "q_associated_symptoms",
-    "prompt": "Bạn có sốt, mệt, buồn nôn không?",
+    "prompt": "Bạn có triệu chứng nào đi kèm không?",
     "inputType": "SINGLE_CHOICE",
     "options": [
         "Có sốt",
@@ -126,7 +117,6 @@ ASSOCIATED_SYMPTOMS_QUESTION = {
 ASSESSMENT_QUESTIONS = [
     DURATION_QUESTION,
     SEVERITY_QUESTION,
-    PROGRESSION_QUESTION,
     ASSOCIATED_SYMPTOMS_QUESTION,
 ]
 # =========================================================
@@ -148,20 +138,24 @@ def question_response(
         },
     }
 
-def completed_response(
-    session_id: str,
-    answers: dict,
-) -> dict:
-    # Use the provided follow-up JSON as the source of the mock result.
-    mock = load_mock_json("mock_followup.json")
 
-    supporting_factors = list(mock.get("supporting_factors", []))
-    supporting_factors.extend([
-        f"Thời gian triệu chứng: {answers['q_duration']}",
-        f"Mức độ triệu chứng: {answers['q_severity']}",
-        f"Diễn biến triệu chứng: {answers['q_progression']}",
-        f"Triệu chứng kèm theo: {answers['q_associated_symptoms']}",
-    ])
+def completed_response(session_id: str, answers: dict):
+    mock = load_mock_json("mock_completed.json")
+
+    assessment = mock.get("assessment_result", {})
+
+    suspected_condition = assessment.get("suspected_condition")
+    reasoning = assessment.get("reasoning")
+    disease_overview = assessment.get("disease_overview")
+    next_steps = assessment.get("next_steps", [])
+
+    supporting_factors = []
+
+    if disease_overview:
+        supporting_factors.append(disease_overview)
+
+    for key, answer in answers.items():
+        supporting_factors.append(f"{key}: {answer}")
 
     return {
         "sessionId": session_id,
@@ -172,32 +166,46 @@ def completed_response(
             "question": None,
             "assessmentResult": {
                 "triageLevel": "MEDIUM",
-                "possibleConditions": [],
-                "explanation": mock.get("explanation"),
+                "possibleConditions": (
+                    [suspected_condition] if suspected_condition else []
+                ),
+                "explanation": reasoning,
                 "supportingFactors": supporting_factors,
-                "recommendations": [mock["recommended_action"]]
-                    if mock.get("recommended_action") else [],
-                "warningSigns": mock.get("warning_signs", []),
+                "recommendations": next_steps,
+                "warningSigns": [],
                 "emergencyFacilities": [],
             },
         },
     }
 
 
-def emergency_response(session_id: str) -> dict:
-    # Use the provided emergency JSON as the source of the mock result.
+
+
+def emergency_response(session_id: str):
     mock = load_mock_json("mock_emergency.json")
 
-    facilities = []
+    # Lấy đúng các trường từ mock_emergency.json
+    emergency_message = mock.get(
+        "emergency_message",
+        "Bạn có dấu hiệu cần được hỗ trợ y tế khẩn cấp."
+    )
+
+    recommended_action = mock.get("recommended_action", "")
+
+    # Chuyển danh sách cơ sở cấp cứu sang format của API
+    emergency_facilities = []
+
     for facility in mock.get("emergency_facilities", []):
-        distance_text = str(facility.get("distance", ""))
-        distance_match = re.search(r"([0-9]+(?:\\.[0-9]+)?)", distance_text)
-        facilities.append({
+        distance_text = str(facility.get("distance", "0"))
+        match = re.search(r"([0-9]+(?:\.[0-9]+)?)", distance_text)
+
+        distance_km = float(match.group(1)) if match else 0.0
+
+        emergency_facilities.append({
             "name": facility.get("name", ""),
             "address": facility.get("address", ""),
             "phone": facility.get("phone", ""),
-            "distanceKm": float(distance_match.group(1))
-                if distance_match else 0.0,
+            "distanceKm": distance_km,
         })
 
     return {
@@ -210,12 +218,13 @@ def emergency_response(session_id: str) -> dict:
             "assessmentResult": {
                 "triageLevel": "CRITICAL",
                 "possibleConditions": [],
-                "explanation": mock.get("explanation"),
-                "supportingFactors": mock.get("supporting_factors", []),
-                "recommendations": [mock["recommended_action"]]
-                    if mock.get("recommended_action") else [],
-                "warningSigns": mock.get("warning_signs", []),
-                "emergencyFacilities": facilities,
+                "explanation": emergency_message,
+                "supportingFactors": [],
+                "recommendations": (
+                    [recommended_action] if recommended_action else []
+                ),
+                "warningSigns": [],
+                "emergencyFacilities": emergency_facilities,
             },
         },
     }
@@ -224,14 +233,16 @@ def emergency_response(session_id: str) -> dict:
 # 4. CONVERSATION HISTORY HELPERS
 # =========================================================
 def identify_question(prompt: str):
-    """
-    Nhận diện câu hỏi của Backend dựa trên nội dung
-    message role=assistant trong conversationHistory.
-    """
     normalized_prompt = prompt.strip().lower()
+
+    print("DEBUG prompt cần nhận diện:", repr(normalized_prompt))
     for index, question in enumerate(ASSESSMENT_QUESTIONS):
-        if question["prompt"].strip().lower() in normalized_prompt:
+        expected = question["prompt"].strip().lower()
+        print("DEBUG expected:", repr(expected))
+
+        if expected in normalized_prompt:
             return index
+
     return None
 def collect_question_answers(history: list) -> dict:
     """
@@ -341,6 +352,9 @@ def mock_ai_assessment(data: AIAssessmentInput):
     current_question_index = identify_question(
         last_assistant_message.content
     )
+    print("DEBUG latest assistant:", repr(last_assistant_message.content))
+    print("DEBUG current_question_index:", current_question_index)
+    print("DEBUG answers:", collect_question_answers(history))
     # Unexpected history: do not assume the assessment is complete.
     if current_question_index is None:
         return question_response(
